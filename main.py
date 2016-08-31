@@ -4,20 +4,24 @@ import discord
 import allinbot
 
 CONFIG_FILE = 'bot.cfg'
+BOT_TOKEN_ENVIRONMENT_VARIABLE = 'BOT_TOKEN'
 
 
 def main():
-    config = configparser.ConfigParser()
-    
-    if not os.path.isfile(CONFIG_FILE):
-        raise FileNotFoundError('Could not find config file ' + CONFIG_FILE)
 
-    config.read('bot.cfg')
-    try:
-        token = config['authentication']['token']
-    except configparser.Error:
-        print('Failed to parse configuration from ' + CONFIG_FILE)
-        raise
+    if os.path.isfile(CONFIG_FILE):
+        config = configparser.ConfigParser()
+        config.read('bot.cfg')
+        try:
+            token = config['authentication']['token']
+        except configparser.Error:
+            print('Failed to parse configuration from ' + CONFIG_FILE)
+            raise
+    else:
+        token = os.environ.get(BOT_TOKEN_ENVIRONMENT_VARIABLE)
+
+    if not token:
+        raise Exception("Could not resolve bot token")
 
     bot = allinbot.Bot(token, discord.Client())
     bot.register_handler(allinbot.logging_handler)
