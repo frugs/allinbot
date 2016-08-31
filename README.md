@@ -5,7 +5,7 @@
 [authentication]
 token=YOUR_TOKEN_HERE
 ```
-
+- Alternatively set the `BOT_TOKEN` environment variable with your bot token.
 - run `main.py` using a python 3.5.2 interpreter or above (`python3 main.py`)
 
 # Dependencies
