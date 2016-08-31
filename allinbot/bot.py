@@ -1,10 +1,9 @@
-from typing import Callable, Iterable, Awaitable
+from typing import Iterable
 import discord
+from .handler import Handler
 
 
 class Bot:
-
-    Handler = Callable[[discord.Client, discord.Message], Awaitable[bool]]
 
     def __init__(self, token: str, client: discord.Client):
         self.token = token
