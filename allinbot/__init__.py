@@ -1,3 +1,3 @@
 from allinbot.bot import Bot
-from allinbot.simplehandlers import logging_handler, create_ping_pong_handler
-from allinbot.choosemaphandler import choose_map_handler
+from allinbot.simplehandlers import LoggingHandler, PingPongHandler
+from allinbot.mappoolhandlers import ChooseMapHandler, MapPoolHandler

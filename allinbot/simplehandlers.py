@@ -1,22 +1,37 @@
-from typing import Awaitable
 from .handler import Handler
 import discord
 
 
-async def logging_handler(client: discord.Client, message: discord.Message) -> Awaitable[bool]:
-    print(message.channel)
-    print(message.author)
-    print(message.content)
-    return True
+class LoggingHandler(Handler):
+
+    def can_handle_message(self, message: discord.Message):
+        return True
+
+    async def handle_message(self, client: discord.Client, message: discord.Message):
+        print(message.channel)
+        print(message.author)
+        print(message.content)
+
+    def description(self):
+        return ""
 
 
-def create_ping_pong_handler(ping: str, pong: str) -> Handler:
+class PingPongHandler(Handler):
 
-    async def handler(client: discord.Client, message: discord.Message) -> Awaitable[bool]:
-        if message.content == ping:
-            await client.send_message(message.channel, pong)
-            return True
+    def __init__(self, ping: str, pong: str, desc: str=None):
+        self.ping = ping
+        self.pong = pong
 
-        return False
+        if desc is not None:
+            self.desc = desc
+        else:
+            self.desc = ping
 
-    return handler
+    def can_handle_message(self, message: discord.Message):
+        return message.content == self.ping
+
+    async def handle_message(self, client: discord.Client, message: discord.Message):
+        await client.send_message(message.channel, self.pong)
+
+    def description(self):
+        return self.desc

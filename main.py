@@ -25,11 +25,17 @@ def main():
 
     bot = allinbot.Bot(token, discord.Client())
 
-    bot.register_handler(allinbot.logging_handler)
-    bot.register_handler(allinbot.create_ping_pong_handler("!test", "test!"))
-    bot.register_handler(
-        allinbot.create_ping_pong_handler("!winrate", "http://allinwinrateleaderboard.azurewebsites.net/"))
-    bot.register_handler(allinbot.choose_map_handler)
+    bot.register_handler(allinbot.LoggingHandler())
+    bot.register_handler(allinbot.PingPongHandler("!test", "test!", ""))
+
+    win_rate_handler = allinbot.PingPongHandler(
+        "!winrate",
+        "http://allinwinrateleaderboard.azurewebsites.net/",
+        "!winrate - Links to the All-Inspiration Win Rate Leaderboard")
+    bot.register_handler(win_rate_handler)
+
+    bot.register_handler(allinbot.ChooseMapHandler())
+    bot.register_handler(allinbot.MapPoolHandler())
 
     bot.start()
     bot.stop()
