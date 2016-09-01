@@ -27,7 +27,7 @@ def main():
 
     bot.register_handler(allinbot.LoggingHandler())
     bot.register_handler(allinbot.PingPongHandler("!test", "test!", ""))
-    bot.register_handler(allinbot.PingPongHandler("!whoisthebestontheteam", "@Rhizer#6384"))
+    bot.register_handler(allinbot.PingPongHandler("!whoisthebestontheteam", "<@!169598177714896897>"))
 
     win_rate_handler = allinbot.PingPongHandler(
         "!winrate",
