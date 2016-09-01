@@ -3,6 +3,9 @@ import discord
 
 
 class LoggingHandler(Handler):
+    """
+    Handler which logs everything that is said in all channels to std out
+    """
 
     def can_handle_message(self, message: discord.Message):
         return True
@@ -17,6 +20,9 @@ class LoggingHandler(Handler):
 
 
 class PingPongHandler(Handler):
+    """
+    Handles a message which matches {ping} by messaging {pong}
+    """
 
     def __init__(self, ping: str, pong: str, desc: str=None):
         self.ping = ping

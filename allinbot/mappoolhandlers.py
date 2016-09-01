@@ -13,6 +13,9 @@ MAPS = [
 
 
 class ChooseMapHandler(Handler):
+    """
+    Handler which selects a random map from the map pool and messages it
+    """
 
     def can_handle_message(self, message: discord.Message):
         return message.content == "!choosemap"
@@ -27,6 +30,9 @@ class ChooseMapHandler(Handler):
 
 
 class MapPoolHandler(Handler):
+    """
+    Handler which messages the current map pool
+    """
 
     def can_handle_message(self, message: discord.Message):
         return message.content == "!mappool"
