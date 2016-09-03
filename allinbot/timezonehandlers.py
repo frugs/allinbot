@@ -20,13 +20,7 @@ class TimeZoneConversionHandler(Handler):
             from_time_args = match.group(1).split(' ')
             to_timezone = match.group(2)
 
-            if len(from_time_args) == 3:
-                date = from_time_args[0]
-                time = from_time_args[1]
-                from_tz_str = from_time_args[2]
-
-                naive_from_datetime = datetime.strptime(date + " " + time, "%d/%m %H:%M")
-            elif len(from_time_args) == 2:
+            if len(from_time_args) == 2:
                 time = from_time_args[0]
                 from_tz_str = from_time_args[1]
 
@@ -35,13 +29,14 @@ class TimeZoneConversionHandler(Handler):
 
                 naive_from_datetime = now.replace(hour=naive_time_only.hour, minute=naive_time_only.minute)
             else:
-                raise ValueError("Invalid remote date")
+                raise ValueError("Invalid from_time")
 
             from_datetimes = timezone.localise_to_possible_timezones_from_name(naive_from_datetime, from_tz_str)
 
             if not from_datetimes:
                 raise ValueError("from_timezone unrecognised")
 
+            replies = []
             for from_datetime in from_datetimes:
                 to_datetimes = timezone.normalise_to_possible_timezones_from_name(from_datetime, to_timezone)
 
@@ -49,17 +44,18 @@ class TimeZoneConversionHandler(Handler):
                     raise ValueError("to_timezone unrecognised")
 
                 for to_datetime in to_datetimes:
-                    datetime_format = "%d %b %H:%M %Z%z"
-                    from_time_str = from_datetime.strftime(datetime_format)
-                    to_time_str = to_datetime.strftime(datetime_format)
+                    from_time_str = from_datetime.strftime("%H:%M %Z%z")
+                    from_zone = from_datetime.tzinfo.zone
 
-                    await client.send_message(message.channel, "{} is {}".format(from_time_str, to_time_str))
+                    to_time_str = to_datetime.strftime("**%H:%M** %Z%z")
+                    to_zone = to_datetime.tzinfo.zone
+
+                    replies.append("_{} {}_\n{} **{}**".format(from_time_str, from_zone, to_time_str, to_zone))
+
+            await client.send_message(message.channel, "\n------\n".join(replies))
 
         except ValueError:
-            await client.send_message("Usage: !timezone {date} {time} {from_timezone} to {to_timezone}")
-
-
+            await client.send_message("Usage: !timezone {time} {from_timezone} to {to_timezone}")
 
     def description(self) -> str:
-        return ("!timezone {day}/{month} {time} {from_timezone} to {to_timezone}\n"
-                "!timezone {time} {from_timezone} to {to_timezone}")
+        return "!timezone {time} {from_timezone} to {to_timezone}"
