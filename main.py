@@ -45,6 +45,8 @@ def main():
     bot.register_handler(allinbot.ChooseMapHandler())
     bot.register_handler(allinbot.MapPoolHandler())
 
+    bot.register_handler(allinbot.TimeZoneConversionHandler())
+
     bot.start()
     bot.stop()
 
