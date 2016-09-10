@@ -26,7 +26,7 @@ def main():
     bot = allinbot.Bot(token, discord.Client())
 
     bot.register_handler(allinbot.PingPongHandler("!test", "test!", ""))
-    bot.register_handler(allinbot.PingPongHandler("!whoisthebestontheteam", "<@!169598177714896897>"))
+    bot.register_handler(allinbot.PingPongHandler("!whoisthebestontheteam", "<@!93018397935144960>"))
 
     lobster_handler = allinbot.PingRandomPongHandler(
         "!bringoutthedancinglobsters",
