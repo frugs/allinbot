@@ -1,3 +1,5 @@
 bot.cfg
 .idea/
 **/__pycache__/
+calendar-cred.json
+client_secret.json
