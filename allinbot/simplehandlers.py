@@ -1,22 +1,6 @@
-from .handler import Handler
 import discord
 
-
-class LoggingHandler(Handler):
-    """
-    Handler which logs everything that is said in all channels to std out
-    """
-
-    def can_handle_message(self, message: discord.Message):
-        return True
-
-    async def handle_message(self, client: discord.Client, message: discord.Message):
-        print(message.channel)
-        print(message.author)
-        print(message.content)
-
-    def description(self):
-        return ""
+from .handler import Handler
 
 
 class PingPongHandler(Handler):
