@@ -1,4 +1,6 @@
 from typing import Iterable
+
+import asyncio
 import discord
 from .handler import Handler
 
@@ -20,15 +22,13 @@ class Bot:
         @client.event
         async def on_message(message: discord.Message):
             if message.content == "!help":
+                print(message.channel.id)
                 await Bot._describe_handlers(self.client, message, self.handlers)
             else:
                 await Bot._dispatch_message_to_handlers(self.client, message, self.handlers)
 
     def start(self):
-        self.client.run(self.token)
-
-    def stop(self):
-        self.client.close()
+        return asyncio.ensure_future(self.client.start(self.token), loop=self.client.loop)
 
     def register_handler(self, handler: Handler):
         self.handlers.append(handler)
