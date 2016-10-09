@@ -24,14 +24,15 @@ class TrialPeriodReminderTask(Task):
             in client.get_all_members()
             if TrialPeriodReminderTask._should_trial_be_over(member)]
 
-        mentions = [member.mention for member in trial_finished_members]
-        message = self.reminder_mention + " Trial members due to finish their trials:\n" + "\n".join(mentions)
+        if trial_finished_members:
+            mentions = [member.mention for member in trial_finished_members]
+            message = self.reminder_mention + " Trial members due to finish their trials:\n" + "\n".join(mentions)
 
-        channel = client.get_channel(self.reminder_channel_id)
+            channel = client.get_channel(self.reminder_channel_id)
 
-        # fixme: seems like we can sometimes be logged in but not fully connected to server (so no channel list)
-        if channel:
-            await client.send_message(channel, message)
+            # fixme: seems like we can sometimes be logged in but not fully connected to server (so no channel list)
+            if channel:
+                await client.send_message(channel, message)
 
     def should_repeat_task(self) -> bool:
         return True
