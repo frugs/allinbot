@@ -61,7 +61,7 @@ def main():
         allinbot.TrialPeriodReminderTask(client, "233736236379013121", "<@&176016120275402752>")
     ]
 
-    task_scheduler = allinbot.TaskScheduler(event_loop, tasks, 39600)
+    task_scheduler = allinbot.TaskScheduler(event_loop, tasks, 79200)
 
     try:
         futures = [task_scheduler.start(), bot.start()]
