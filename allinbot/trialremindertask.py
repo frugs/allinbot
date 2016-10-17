@@ -24,8 +24,12 @@ class TrialPeriodReminderTask(Task):
             in client.get_all_members()
             if TrialPeriodReminderTask._should_trial_be_over(member)]
 
+        trial_finished_members.sort(key=lambda x: x.joined_at)
+
         if trial_finished_members:
-            mentions = [member.mention for member in trial_finished_members]
+            mentions = [member.mention + " joined on " + member.joined_at.strftime("**%d %h %Y**")
+                        for member
+                        in trial_finished_members]
             message = self.reminder_mention + " Trial members due to finish their trials:\n" + "\n".join(mentions)
 
             channel = client.get_channel(self.reminder_channel_id)
