@@ -67,6 +67,12 @@ def main():
         futures = [task_scheduler.start(), bot.start()]
         event_loop.run_until_complete(asyncio.gather(*futures))
 
+        print("event loop finished.")
+
+    except Exception as e:
+        print(e)
+        raise e
+
     finally:
         event_loop.stop()
         client.close()
