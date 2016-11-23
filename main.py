@@ -44,12 +44,6 @@ def main():
         ])
     bot.register_handler(lobster_handler)
 
-    win_rate_handler = allinbot.PingPongHandler(
-        "!winrate",
-        "http://allinwinrateleaderboard.azurewebsites.net/",
-        "!winrate - Links to the All-Inspiration Win Rate Leaderboard")
-    bot.register_handler(win_rate_handler)
-
     bot.register_handler(allinbot.ChooseMapHandler())
     bot.register_handler(allinbot.MapPoolHandler())
 
