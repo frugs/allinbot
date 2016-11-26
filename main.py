@@ -7,7 +7,6 @@ import allinbot.logginghandler
 
 CONFIG_FILE = 'bot.cfg'
 BOT_TOKEN_ENVIRONMENT_VARIABLE = 'BOT_TOKEN'
-LOG_DIR_ENVIRONMENT_VARIABLE = 'LOG_DIR'
 
 
 def main():
@@ -17,13 +16,11 @@ def main():
         config.read('bot.cfg')
         try:
             token = config['authentication']['token']
-            log_dir = config['logging']['log_directory']
         except configparser.Error:
             print('Failed to parse configuration from ' + CONFIG_FILE)
             raise
     else:
         token = os.environ.get(BOT_TOKEN_ENVIRONMENT_VARIABLE)
-        log_dir = os.environ.get(LOG_DIR_ENVIRONMENT_VARIABLE)
 
     if not token:
         raise Exception("Could not resolve bot token")
@@ -49,17 +46,9 @@ def main():
 
     bot.register_handler(allinbot.TimeZoneConversionHandler())
 
-    bot.register_handler(allinbot.LoggingHandler(log_dir))
-
-    tasks = [
-        allinbot.TrialPeriodReminderTask(client, "233736236379013121", "")
-    ]
-
-    task_scheduler = allinbot.TaskScheduler(event_loop, tasks, 79200)
-
     try:
-        futures = [task_scheduler.start(), bot.start()]
-        event_loop.run_until_complete(asyncio.gather(*futures))
+        asyncio.ensure_future(bot.start(), loop=event_loop)
+        event_loop.run_forever()
 
         print("event loop finished.")
 
@@ -68,8 +57,8 @@ def main():
         raise e
 
     finally:
+        event_loop.run_until_complete(bot.stop())
         event_loop.stop()
-        client.close()
 
 if __name__ == '__main__':
     main()

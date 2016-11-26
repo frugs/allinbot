@@ -9,13 +9,11 @@ TRIAL_PERIOD_IN_DAYS = 12
 
 class TrialPeriodReminderTask(Task):
 
-    def __init__(self, client: discord.Client, reminder_channel_id: str, reminder_mention: str):
-        self.client = client
+    def __init__(self, reminder_channel_id: str, reminder_mention: str):
         self.reminder_channel_id = reminder_channel_id
         self.reminder_mention = reminder_mention
 
-    async def perform_task(self):
-        client = self.client
+    async def perform_task(self, client: discord.Client):
         await client.wait_until_login()
 
         trial_finished_members = [
@@ -37,9 +35,6 @@ class TrialPeriodReminderTask(Task):
             # fixme: seems like we can sometimes be logged in but not fully connected to server (so no channel list)
             if channel:
                 await client.send_message(channel, message)
-
-    def should_repeat_task(self) -> bool:
-        return True
 
     @staticmethod
     def _should_trial_be_over(member: discord.Member):

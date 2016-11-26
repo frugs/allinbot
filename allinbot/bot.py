@@ -1,8 +1,8 @@
-from typing import Iterable
-
-import asyncio
 import discord
+import asyncio
+from typing import Iterable
 from .handler import Handler
+from .scheduler import Task
 
 
 class Bot:
@@ -10,6 +10,7 @@ class Bot:
     def __init__(self, token: str, client: discord.Client):
         self.token = token
         self.client = client
+        self.event_loop = client.loop
         self.handlers = []
 
         @client.event
@@ -27,14 +28,21 @@ class Bot:
             else:
                 await Bot._dispatch_message_to_handlers(self.client, message, self.handlers)
 
-    def start(self):
-        return asyncio.ensure_future(self.client.start(self.token), loop=self.client.loop)
+    async def start(self):
+        await self.client.start(self.token)
+
+    async def stop(self):
+        await self.client.logout()
+        await self.client.close()
 
     def register_handler(self, handler: Handler):
         self.handlers.append(handler)
 
     def unregister_handler(self, handler: Handler):
         self.handlers.remove(handler)
+
+    def schedule_task(self, task: Task):
+        asyncio.ensure_future(task.perform_task(self.client), loop=self.event_loop)
 
     @staticmethod
     async def _describe_handlers(client: discord.Client, message: discord.Message, handlers: Iterable[Handler]):

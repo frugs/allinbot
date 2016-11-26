@@ -3,12 +3,13 @@ import discord
 from .handler import Handler
 
 MAPS = [
-    "Frozen Temple",
-    "Frost",
-    "Dasan Station",
-    "Apotheosis",
-    "King Sejong Station",
-    "New Gettysburg"
+    "Daybreak LE",
+    "Echo LE",
+    "Habitation Station LE",
+    "Newkirk Precinct TE",
+    "Overgrowth LE",
+    "Vaani Research Station",
+    "Whirlwind LE"
 ]
 
 

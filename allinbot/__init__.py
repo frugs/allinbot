@@ -1,6 +1,5 @@
 from allinbot.bot import Bot
 from allinbot.scheduler import Task
-from allinbot.scheduler import TaskScheduler
 from allinbot.trialremindertask import TrialPeriodReminderTask
 from allinbot.simplehandlers import PingPongHandler
 from allinbot.logginghandler import LoggingHandler

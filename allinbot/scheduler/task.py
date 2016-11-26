@@ -1,6 +1,6 @@
-class Task:
-    async def perform_task(self):
-        raise NotImplementedError("This must be implemented!")
+import discord
 
-    def should_repeat_task(self) -> bool:
+
+class Task:
+    async def perform_task(self, client: discord.Client):
         raise NotImplementedError("This must be implemented!")
