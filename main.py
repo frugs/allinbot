@@ -2,6 +2,8 @@ import os
 import configparser
 import asyncio
 import discord
+import growler
+
 import allinbot
 import allinbot.logginghandler
 
@@ -46,8 +48,16 @@ def main():
 
     bot.register_handler(allinbot.TimeZoneConversionHandler())
 
+    web_app = growler.App('allinbot_controller', loop=event_loop)
+
+    @web_app.get('/trial_reminder')
+    def index(req, res):
+        bot.schedule_task(allinbot.TrialPeriodReminderTask("233736236379013121", ""))
+        res.send_text("Trial reminder scheduled")
+
     try:
         asyncio.ensure_future(bot.start(), loop=event_loop)
+        asyncio.Server = web_app.create_server(port=8081)
         event_loop.run_forever()
 
         print("event loop finished.")
