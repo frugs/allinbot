@@ -1,30 +1,15 @@
 import os
-import configparser
 import asyncio
 import discord
 import growler
-
 import allinbot
-import allinbot.logginghandler
-
-CONFIG_FILE = 'bot.cfg'
-BOT_TOKEN_ENVIRONMENT_VARIABLE = 'BOT_TOKEN'
 
 
 def main():
+    token = os.environ.get('BOT_TOKEN')
+    firebase_config_path = os.environ.get('FIREBASE_CONFIG_PATH')
 
-    if os.path.isfile(CONFIG_FILE):
-        config = configparser.ConfigParser()
-        config.read('bot.cfg')
-        try:
-            token = config['authentication']['token']
-        except configparser.Error:
-            print('Failed to parse configuration from ' + CONFIG_FILE)
-            raise
-    else:
-        token = os.environ.get(BOT_TOKEN_ENVIRONMENT_VARIABLE)
-
-    if not token:
+    if not token or not firebase_config_path:
         raise Exception("Could not resolve bot token")
 
     event_loop = asyncio.get_event_loop()
@@ -47,6 +32,12 @@ def main():
     bot.register_handler(allinbot.MapPoolHandler())
 
     bot.register_handler(allinbot.TimeZoneConversionHandler())
+
+    db_config = allinbot.database.load_db_config(firebase_config_path)
+    bot.register_handler(allinbot.zerg_mention_handler(db_config))
+    bot.register_handler(allinbot.protoss_mention_handler(db_config))
+    bot.register_handler(allinbot.terran_mention_handler(db_config))
+    bot.register_handler(allinbot.random_mention_handler(db_config))
 
     web_app = growler.App('allinbot_controller', loop=event_loop)
 

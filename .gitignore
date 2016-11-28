@@ -4,3 +4,5 @@ bot.cfg
 calendar-cred.json
 client_secret.json
 logs/
+firebase.cfg
+allinbotServiceAccountCredentials.json

@@ -1,8 +1,10 @@
 from allinbot.bot import Bot
-from allinbot.scheduler import Task
+from allinbot.task import Task
 from allinbot.trialremindertask import TrialPeriodReminderTask
 from allinbot.simplehandlers import PingPongHandler
 from allinbot.logginghandler import LoggingHandler
 from allinbot.randomhandlers import PingRandomPongHandler
 from allinbot.mappoolhandlers import ChooseMapHandler, MapPoolHandler
 from allinbot.timezonehandlers import TimeZoneConversionHandler
+from allinbot.racementionhandlers import zerg_mention_handler, protoss_mention_handler, terran_mention_handler, random_mention_handler
+import allinbot.database

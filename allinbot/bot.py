@@ -2,7 +2,7 @@ import discord
 import asyncio
 from typing import Iterable
 from .handler import Handler
-from .scheduler import Task
+from .task import Task
 
 
 class Bot:

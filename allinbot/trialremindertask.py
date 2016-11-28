@@ -1,7 +1,7 @@
 import discord
 import datetime
 
-from .scheduler import Task
+from .task import Task
 
 
 TRIAL_PERIOD_IN_DAYS = 12
