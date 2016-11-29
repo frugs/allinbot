@@ -38,12 +38,12 @@ class RaceMentionHandler(Handler):
         mentions = ", ".join([_convert_to_mention(id) for id in ids])
 
         match = re.match(self._matcher, message.content)
-        message_content = match.group(1)
+        message_content = match.group(1) if match else ""
 
         await client.send_message(message.channel, message_content + "\n" + mentions)
 
     def can_handle_message(self, message: discord.Message) -> bool:
-        return re.match(self._matcher, message.content)
+        return message.content == "!" + self._race.lower() or re.match(self._matcher, message.content)
 
     def description(self) -> str:
         return "!" + self._race.lower() + " *{message}* - @mention members who play " + self._race + " with {message}"
