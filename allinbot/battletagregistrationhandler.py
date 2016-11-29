@@ -23,7 +23,7 @@ class BattleTagRegistrationDatabaseTask(DatabaseTask[None]):
             "battle_tag": self._battle_tag,
             "discord_display_name": self._discord_display_name
         }
-        db.child("member").child(self._discord_id).update(data)
+        db.child("members").child(self._discord_id).update(data)
         return None
 
 
