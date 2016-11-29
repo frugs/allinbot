@@ -44,7 +44,7 @@ class BattleTagRegistrationHandler(Handler):
         match = re.match(_PATTERN, message.content)
         battle_tag = match.group(1)
 
-        discord_display_name = message.author.display_name()
+        discord_display_name = message.author.display_name
 
         task = BattleTagRegistrationDatabaseTask(discord_id, battle_tag, discord_display_name, self._db_config)
         await perform_database_task(client.loop, task)
