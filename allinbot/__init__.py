@@ -7,4 +7,5 @@ from allinbot.randomhandlers import PingRandomPongHandler
 from allinbot.mappoolhandlers import ChooseMapHandler, MapPoolHandler
 from allinbot.timezonehandlers import TimeZoneConversionHandler
 from allinbot.racementionhandlers import zerg_mention_handler, protoss_mention_handler, terran_mention_handler, random_mention_handler
+from allinbot.battletagregistrationhandler import BattleTagRegistrationHandler
 import allinbot.database

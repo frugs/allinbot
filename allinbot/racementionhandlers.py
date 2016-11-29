@@ -11,7 +11,7 @@ def _convert_to_mention(id: str) -> str:
     return "<@!{}>".format(id)
 
 
-class QueryRacePlayersDatabaseTask(DatabaseTask[typing.List[str]]):
+class QueryRacePlayerDiscordIdsDatabaseTask(DatabaseTask[typing.List[str]]):
 
     def __init__(self, race: str, db_config: dict):
         DatabaseTask.__init__(self, db_config)
@@ -34,7 +34,7 @@ class RaceMentionHandler(Handler):
         self._matcher = re.compile("^!{}\s+(.*)$".format(race.lower()))
 
     async def handle_message(self, client: discord.Client, message: discord.Message):
-        ids = await perform_database_task(client.loop, QueryRacePlayersDatabaseTask(self._race, self._db_config))
+        ids = await perform_database_task(client.loop, QueryRacePlayerDiscordIdsDatabaseTask(self._race, self._db_config))
         mentions = ", ".join([_convert_to_mention(id) for id in ids])
 
         match = re.match(self._matcher, message.content)

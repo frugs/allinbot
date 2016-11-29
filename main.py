@@ -9,8 +9,11 @@ def main():
     token = os.environ.get('BOT_TOKEN')
     firebase_config_path = os.environ.get('FIREBASE_CONFIG_PATH')
 
-    if not token or not firebase_config_path:
+    if not token:
         raise Exception("Could not resolve bot token")
+
+    if not firebase_config_path:
+        raise Exception("Could not resolve firebase config")
 
     event_loop = asyncio.get_event_loop()
 
@@ -38,6 +41,8 @@ def main():
     bot.register_handler(allinbot.protoss_mention_handler(db_config))
     bot.register_handler(allinbot.terran_mention_handler(db_config))
     bot.register_handler(allinbot.random_mention_handler(db_config))
+
+    bot.register_handler(allinbot.BattleTagRegistrationHandler(db_config))
 
     web_app = growler.App('allinbot_controller', loop=event_loop)
 
