@@ -35,7 +35,11 @@ class RaceMentionHandler(Handler):
 
     async def handle_message(self, client: discord.Client, message: discord.Message):
         ids = await perform_database_task(client.loop, QueryRacePlayerDiscordIdsDatabaseTask(self._race, self._db_config))
-        mentions = ", ".join([_convert_to_mention(id) for id in ids])
+        server_members = filter(None, [message.server.get_member(id) for id in ids])
+        online_server_members = [
+            member for member in server_members
+            if member.status == discord.Status.online or member.status == discord.Status.idle]
+        mentions = ", ".join([member.mention for member in online_server_members])
 
         match = re.match(self._matcher, message.content)
         message_content = match.group(1) if match else ""
@@ -43,7 +47,7 @@ class RaceMentionHandler(Handler):
         await client.send_message(message.channel, message_content + "\n" + mentions)
 
     def can_handle_message(self, message: discord.Message) -> bool:
-        return message.content == "!" + self._race.lower() or re.match(self._matcher, message.content)
+        return message.server and message.content == "!" + self._race.lower() or re.match(self._matcher, message.content)
 
     def description(self) -> str:
         return "!" + self._race.lower() + " *{message}* - @mention members who play " + self._race + " with {message}"
