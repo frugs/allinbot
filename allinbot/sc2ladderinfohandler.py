@@ -1,5 +1,7 @@
 import re
 import datetime
+import typing
+import itertools
 import discord
 import pyrebase
 
@@ -31,6 +33,18 @@ class RetrieveLadderInfoDatabaseTask(DatabaseTask[dict]):
             return {}
 
         return query_result.val()
+
+
+def order_by_highest_league_then_most_played(regions: typing.Iterable):
+    def key(region: dict):
+        if "current" not in region:
+            return 0, 0
+
+        races = region["current"]
+        return max([race.get("league_id", 0) for race in races]), sum(race.get("games_played", 0) for race in races)
+
+    region_list = list(regions)
+    return sorted(region_list, key=key, reverse=True)
 
 
 class Sc2LadderInfoHandler(Handler):
@@ -77,7 +91,7 @@ class Sc2LadderInfoHandler(Handler):
 
                 message_to_send += "\n"
 
-                for region, region_stats in regions.items():
+                for region, region_stats in order_by_highest_league_then_most_played(regions.items()):
 
                     current_season_stats = region_stats.get("current")
                     if current_season_stats:
