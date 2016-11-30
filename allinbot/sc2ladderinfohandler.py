@@ -49,6 +49,10 @@ class Sc2LadderInfoHandler(Handler):
         else:
             message_to_send = "**<@{}>'s StarCraft II ladder info**\n".format(discord_id)
 
+            battle_tag = ladder_info.get("battle_tag", None)
+            if battle_tag:
+                message_to_send += "Battle Tag: **{}**\n".format(battle_tag)
+
             last_updated = ladder_info.get("last_updated", None)
             if last_updated:
                 last_updated_datetime = datetime.datetime.fromtimestamp(last_updated, datetime.timezone.utc)
