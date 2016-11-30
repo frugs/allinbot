@@ -19,7 +19,7 @@ class BattleTagRegistrationDatabaseTask(DatabaseTask[None]):
 
     def execute_with_database(self, db: pyrebase.pyrebase.Database) -> None:
         data = {
-            "discord_id": self._discord_id,
+            "discord_id": str(self._discord_id),
             "battle_tag": self._battle_tag,
             "discord_display_name": self._discord_display_name
         }

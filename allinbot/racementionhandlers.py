@@ -35,7 +35,7 @@ class RaceMentionHandler(Handler):
 
     async def handle_message(self, client: discord.Client, message: discord.Message):
         ids = await perform_database_task(client.loop, QueryRacePlayerDiscordIdsDatabaseTask(self._race, self._db_config))
-        server_members = filter(None, [message.server.get_member(id) for id in ids])
+        server_members = filter(None, [message.server.get_member(discord_id) for discord_id in ids])
         online_server_members = [
             member for member in server_members
             if member.status == discord.Status.online or member.status == discord.Status.idle]

@@ -7,7 +7,7 @@ import allinbot
 
 def main():
     token = os.environ.get('BOT_TOKEN')
-    firebase_config_path = os.environ.get('FIREBASE_CONFIG_PATH')
+    firebase_config_path = os.getenv('FIREBASE_CONFIG_PATH', 'firebase.cfg')
 
     if not token:
         raise Exception("Could not resolve bot token")
@@ -43,6 +43,8 @@ def main():
     bot.register_handler(allinbot.random_mention_handler(db_config))
 
     bot.register_handler(allinbot.BattleTagRegistrationHandler(db_config))
+
+    bot.register_handler(allinbot.Sc2LadderInfoHandler(db_config))
 
     web_app = growler.App('allinbot_controller', loop=event_loop)
 
