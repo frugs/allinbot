@@ -62,15 +62,15 @@ class Sc2LadderInfoHandler(Handler):
 
             races_played = [race for race in _RACES if ladder_info.get(race.lower() + "_player")]
             if races_played:
-                message_to_send += "Highest ranked races: *" + ", ".join(races_played) + "*\n"
+                message_to_send += "Highest ranked races: " + ", ".join(races_played) + "\n"
 
             current_season_games_played = ladder_info.get("current_season_games_played", None)
             if current_season_games_played is not None:
-                message_to_send += "Total games played this season: *{}*\n".format(current_season_games_played)
+                message_to_send += "Total games played this season: {}\n".format(current_season_games_played)
 
             previous_season_games_played = ladder_info.get("previous_season_games_played", None)
             if previous_season_games_played is not None:
-                message_to_send += "Total games played last season: *{}*\n".format(previous_season_games_played)
+                message_to_send += "Total games played last season: {}\n".format(previous_season_games_played)
 
             regions = ladder_info.get("regions")
             if regions:
@@ -90,11 +90,11 @@ class Sc2LadderInfoHandler(Handler):
                                 race_stats = current_season_stats[race]
                                 league_emblem = _LEAGUE_EMBLEMS[(race_stats.get("league_id", 0))]
                                 message_to_send += "League: {}\n".format(league_emblem)
-                                message_to_send += "MMR: *{}*\n".format(race_stats.get("mmr", 0))
-                                message_to_send += "Games played: *{}*\n".format(race_stats.get("games_played", 0))
-                                message_to_send += "Wins: *{}*\n".format(race_stats.get("wins", 0))
-                                message_to_send += "Losses: *{}*\n".format(race_stats.get("losses", 0))
-                                message_to_send += "Ties: *{}*\n".format(race_stats.get("ties", 0))
+                                message_to_send += "MMR: {}\n".format(race_stats.get("mmr", 0))
+                                message_to_send += "Games played: {}\n".format(race_stats.get("games_played", 0))
+                                message_to_send += "Wins: {}\n".format(race_stats.get("wins", 0))
+                                message_to_send += "Losses: {}\n".format(race_stats.get("losses", 0))
+                                message_to_send += "Ties: {}\n".format(race_stats.get("ties", 0))
 
                                 message_to_send += "\n"
 
