@@ -20,6 +20,7 @@ _LEAGUE_EMBLEMS = [
     "<:masters:230151935053922305>",
     "<:grandmaster:230152770521399296>"]
 
+
 class RetrieveLadderInfoDatabaseTask(DatabaseTask[dict]):
 
     def __init__(self, discord_id: str, db_config: dict):
@@ -36,12 +37,14 @@ class RetrieveLadderInfoDatabaseTask(DatabaseTask[dict]):
 
 
 def order_by_highest_league_then_most_played(regions: typing.Iterable):
-    def key(region: dict):
-        if "current" not in region:
+    def key(region: tuple):
+        region_id, region_data = region
+
+        if "current" not in region_data:
             return 0, 0
 
-        races = region["current"]
-        return max([race.get("league_id", 0) for race in races]), sum(race.get("games_played", 0) for race in races)
+        races = region_data["current"].values()
+        return max(race.get("league_id", 0) for race in races), sum(race.get("games_played", 0) for race in races)
 
     region_list = list(regions)
     return sorted(region_list, key=key, reverse=True)
