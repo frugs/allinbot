@@ -79,7 +79,11 @@ class Sc2LadderInfoHandler(Handler):
 
             races_played = [race for race in _RACES if ladder_info.get(race.lower() + "_player")]
             if races_played:
-                message_to_send += "Highest ranked races: " + ", ".join(races_played) + "\n"
+                message_to_send += "Highest ranked race(s): " + ", ".join(races_played) + "\n"
+
+            current_league = ladder_info.get("current_league", None)
+            if current_league:
+                message_to_send += "Current league: {}\n".format(_LEAGUE_EMBLEMS[current_league])
 
             current_season_games_played = ladder_info.get("current_season_games_played", None)
             if current_season_games_played is not None:
