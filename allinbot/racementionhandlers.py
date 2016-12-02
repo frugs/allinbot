@@ -7,10 +7,6 @@ from .database import perform_database_task, DatabaseTask
 from .handler import Handler
 
 
-def _convert_to_mention(id: str) -> str:
-    return "<@!{}>".format(id)
-
-
 class QueryRacePlayerDiscordIdsDatabaseTask(DatabaseTask[typing.List[str]]):
 
     def __init__(self, race: str, db_config: dict):
@@ -31,7 +27,7 @@ class RaceMentionHandler(Handler):
     def __init__(self, race: str, db_config: dict):
         self._race = race
         self._db_config = db_config
-        self._matcher = re.compile("^!{}\s+(.*)$".format(race.lower()))
+        self._matcher = re.compile("^!{}alert\s+(.*)$".format(race.lower()))
 
     async def handle_message(self, client: discord.Client, message: discord.Message):
         ids = await perform_database_task(client.loop, QueryRacePlayerDiscordIdsDatabaseTask(self._race, self._db_config))
@@ -50,7 +46,7 @@ class RaceMentionHandler(Handler):
         return message.server and message.content == "!" + self._race.lower() or re.match(self._matcher, message.content)
 
     def description(self) -> str:
-        return "!" + self._race.lower() + " *{message}* - @mention members who play " + self._race + " with {message}"
+        return "!" + self._race.lower() + "alert *{message}* - @mention members who play " + self._race + " with {message}"
 
 
 def zerg_mention_handler(db_config: dict) -> Handler:
