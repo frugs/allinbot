@@ -21,6 +21,7 @@ class BattleTagRegistrationDatabaseTask(DatabaseTask[None]):
         data = {
             "discord_id": str(self._discord_id),
             "battle_tag": self._battle_tag,
+            "caseless_battle_tag": self._battle_tag.casefold(),
             "discord_display_name": self._discord_display_name
         }
         db.child("members").child(self._discord_id).update(data)
