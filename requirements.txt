@@ -2,3 +2,4 @@ pyrebase
 pytz
 discord.py
 growler
+icalendar

@@ -46,12 +46,19 @@ def main():
 
     bot.register_handler(allinbot.Sc2LadderInfoHandler(db_config))
 
+    calendar_announcement_task = allinbot.CalendarAnnouncementTask()
+
     web_app = growler.App('allinbot_controller', loop=event_loop)
 
     @web_app.get('/trial_reminder')
-    def index(req, res):
+    def trial_reminder(req, res):
         bot.schedule_task(allinbot.TrialPeriodReminderTask("233736236379013121", ""))
         res.send_text("Trial reminder scheduled")
+
+    @web_app.get('/calendar_announce')
+    def calendar_announce(req, res):
+        bot.schedule_task(calendar_announcement_task)
+        res.send_text("Calendar announcement scheduled")
 
     try:
         asyncio.ensure_future(bot.start(), loop=event_loop)

@@ -1,6 +1,7 @@
 from allinbot.bot import Bot
 from allinbot.task import Task
 from allinbot.trialremindertask import TrialPeriodReminderTask
+from allinbot.calendarannouncementtask import CalendarAnnouncementTask
 from allinbot.simplehandlers import PingPongHandler
 from allinbot.logginghandler import LoggingHandler
 from allinbot.randomhandlers import PingRandomPongHandler
