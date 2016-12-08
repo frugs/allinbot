@@ -27,7 +27,7 @@ class RaceMentionHandler(Handler):
     def __init__(self, race: str, db_config: dict):
         self._race = race
         self._db_config = db_config
-        self._matcher = re.compile("^!{}alert\s+(.*)$".format(race.lower()))
+        self._matcher = re.compile("^@{}\s+(.*)$".format(race.lower()), re.IGNORECASE)
 
     async def handle_message(self, client: discord.Client, message: discord.Message):
         ids = await perform_database_task(client.loop, QueryRacePlayerDiscordIdsDatabaseTask(self._race, self._db_config))
@@ -43,10 +43,10 @@ class RaceMentionHandler(Handler):
         await client.send_message(message.channel, message_content + "\n" + mentions)
 
     def can_handle_message(self, message: discord.Message) -> bool:
-        return message.server and message.content == "!" + self._race.lower() or re.match(self._matcher, message.content)
+        return message.server and (message.content.casefold() == "@{}".format(self._race.lower()).casefold() or re.match(self._matcher, message.content))
 
     def description(self) -> str:
-        return "!" + self._race.lower() + "alert *{message}* - @mention members who play " + self._race + " with {message}"
+        return "@" + self._race.lower() + " *{message}* - @mention members who play " + self._race + " with {message}"
 
 
 def zerg_mention_handler(db_config: dict) -> Handler:
