@@ -7,8 +7,8 @@ import pytz
 from .task import Task
 from .calendar import calendarutils
 
-_ANNOUNCEMENT_CHANNEL_ID = "223831081353216001"
-_ANNOUNCEMENT_TAG = "<@255476627641860097>"
+_ANNOUNCEMENT_CHANNEL_ID = "195057719487627264"
+_ANNOUNCEMENT_TAG = "@here"
 _CALENDAR_URL = "https://calendar.google.com/calendar/ical/3om5b2vfubpugkf3vr6fahh01k%40group.calendar.google.com/public/basic.ics"
 _TIME_FORMAT = "%H:%M %d %b %Y %Z%z"
 _SECONDS_IN_HOUR = 3600
