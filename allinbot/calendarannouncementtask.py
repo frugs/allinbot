@@ -18,7 +18,7 @@ _SECONDS_IN_DAY = _SECONDS_IN_HOUR * 24
 class CalendarAnnouncementTask(Task):
 
     def __init__(self):
-        self._five_miute_announced_events = {}
+        self._five_minute_announced_events = {}
         self._hour_announced_events = {}
 
     async def perform_task(self, client: discord.Client):
@@ -44,9 +44,14 @@ class CalendarAnnouncementTask(Task):
         for component in calendar.walk():
             if component.name == icalendar.Event.name:
                 start_time = icalendar.vDDDTypes.from_ical(component["DTSTART"])
+
+                # DTSTART can be a datetime.date if the event is an all-day event
+                if isinstance(start_time, datetime.date):
+                    start_time = datetime.datetime.combine(start_time, datetime.time())
+
                 event = (start_time, component)
 
-                if now < start_time <= five_minutes_time and component["UID"] not in self._five_miute_announced_events:
+                if now < start_time <= five_minutes_time and component["UID"] not in self._five_minute_announced_events:
                     unannounced_events_in_next_five_minutes.append(event)
 
                 elif five_minutes_time < start_time <= one_hours_time and component["UID"] not in self._hour_announced_events:
@@ -72,7 +77,7 @@ class CalendarAnnouncementTask(Task):
 
                     five_minute_reminder_message += "In {} - **{}**\n*{}*\n".format(
                         time_delta_string, event["SUMMARY"], start_time_string)
-                    self._five_miute_announced_events[event["UID"]] = start_time
+                    self._five_minute_announced_events[event["UID"]] = start_time
 
                 messages_to_send.append(five_minute_reminder_message)
 
@@ -104,5 +109,5 @@ class CalendarAnnouncementTask(Task):
             channel = client.get_channel(_ANNOUNCEMENT_CHANNEL_ID)
             await client.send_message(channel, "\n".join(messages_to_send))
 
-            self._five_miute_announced_events = dict(filter(lambda x: x[1] >= now, self._five_miute_announced_events.items()))
+            self._five_minute_announced_events = dict(filter(lambda x: x[1] >= now, self._five_minute_announced_events.items()))
             self._hour_announced_events = dict(filter(lambda x: x[1] >= now, self._hour_announced_events.items()))
