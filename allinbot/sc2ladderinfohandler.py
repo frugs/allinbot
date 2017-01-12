@@ -99,8 +99,8 @@ class Sc2LadderInfoHandler(Handler):
                 message_to_send += "\n"
 
                 for region, region_stats in order_by_highest_league_then_most_played(regions.items()):
-
-                    current_season_stats = region_stats.get("current")
+                    current_season_key = next(iter(sorted(list(region_stats.keys()), key=lambda x: int(x), reverse=True)), "-1")
+                    current_season_stats = region_stats.get(current_season_key)
                     if current_season_stats:
 
                         message_to_send += "__{} Region Stats__\n\n".format(region.upper())
