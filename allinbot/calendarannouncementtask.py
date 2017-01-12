@@ -1,6 +1,7 @@
 import datetime
 import urllib.request
 import icalendar
+import dateutil.rrule
 import discord
 import pytz
 
@@ -46,8 +47,13 @@ class CalendarAnnouncementTask(Task):
                 start_time = icalendar.vDDDTypes.from_ical(component["DTSTART"])
 
                 # DTSTART can be a datetime.date if the event is an all-day event
-                if isinstance(start_time, datetime.date):
+                if isinstance(start_time, datetime.date) and not isinstance(start_time, datetime.datetime):
                     start_time = datetime.datetime.combine(start_time, datetime.time())
+                    start_time = calendar_timezone.localize(start_time)
+
+                if start_time < now and "RRULE" in component:
+                    parsed_rrule = dateutil.rrule.rrulestr(component["RRULE"].to_ical().decode(), dtstart=start_time)
+                    start_time = parsed_rrule.after(now)
 
                 event = (start_time, component)
 
