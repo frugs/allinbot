@@ -5,7 +5,7 @@ from .task import Task
 
 
 TRIAL_PERIOD_IN_DAYS = 12
-TRIAL_MEMBER_ROLE_ID = "183243538425839617"
+TRIAL_MEMBER_ROLE_ID = "270973930699882497"
 
 
 class TrialPeriodReminderTask(Task):
