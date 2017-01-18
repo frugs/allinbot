@@ -5,6 +5,7 @@ from .task import Task
 
 
 TRIAL_PERIOD_IN_DAYS = 12
+TRIAL_MEMBER_ROLE_ID = "183243538425839617"
 
 
 class TrialPeriodReminderTask(Task):
@@ -39,7 +40,7 @@ class TrialPeriodReminderTask(Task):
     @staticmethod
     def _should_trial_be_over(member: discord.Member):
         def is_trial_member():
-            return any("Trial Member" in role.name for role in member.roles)
+            return any(TRIAL_MEMBER_ROLE_ID == role.id for role in member.roles)
 
         def twelve_days_elapsed_since_joining_server():
             delta = datetime.datetime.utcnow() - member.joined_at
