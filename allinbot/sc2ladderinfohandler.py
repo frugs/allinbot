@@ -94,7 +94,10 @@ class Sc2LadderInfoHandler(Handler):
                 message_to_send += "Total games played last season: {}\n".format(previous_season_games_played)
 
             regions = ladder_info.get("regions")
-            if regions:
+
+            # Only show region stats if the player has been active this season. This extra guard ensures we only show
+            # region stats for the current season.
+            if current_season_games_played and regions:
 
                 message_to_send += "\n"
 
