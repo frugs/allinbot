@@ -3,13 +3,13 @@ import discord
 from .handler import Handler
 
 MAPS = [
-    "Daybreak LE",
-    "Echo LE",
-    "Habitation Station LE",
+    "Abyssal Reef LE",
+    "Bel'Shir Vestige LE",
     "Newkirk Precinct TE",
-    "Overgrowth LE",
-    "Vaani Research Station",
-    "Whirlwind LE"
+    "Paladino Terminal LE",
+    "Proxima Station LE",
+    "Cactus Valley LE",
+    "Honorgrounds LE"
 ]
 
 
