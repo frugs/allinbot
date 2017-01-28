@@ -20,11 +20,19 @@ class TimeZoneConversionHandler(Handler):
             from_time_args = match.group(1).split(' ')
             to_timezone = match.group(2)
 
-            if len(from_time_args) == 2:
-                time = from_time_args[0]
-                from_tz_str = from_time_args[1]
+            if len(from_time_args) >= 2:
+                time = " ".join(from_time_args[0:-1])
+                from_tz_str = from_time_args[-1]
 
-                naive_time_only = datetime.strptime(time, "%H:%M")
+                for time_format in ["%H:%M", "%H%M", "%I:%M %p", "%I:%M%p", "%I%p", "%I %p"]:
+                    try:
+                        naive_time_only = datetime.strptime(time, time_format)
+                        break
+                    except ValueError:
+                        pass
+                else:
+                    raise ValueError("Invalid from_time")
+
                 now = datetime.now()
 
                 naive_from_datetime = now.replace(hour=naive_time_only.hour, minute=naive_time_only.minute)
@@ -54,8 +62,9 @@ class TimeZoneConversionHandler(Handler):
 
             await client.send_message(message.channel, "\n------\n".join(replies))
 
-        except ValueError:
-            await client.send_message("Usage: !timezone {time} {from_timezone} to {to_timezone}")
+        except ValueError as e:
+            await client.send_message(
+                message.channel, str(e) + "\nUsage: !timezone {time} {from_timezone} to {to_timezone}")
 
     def description(self) -> str:
         return "!timezone {time} {from_timezone} to {to_timezone}"
