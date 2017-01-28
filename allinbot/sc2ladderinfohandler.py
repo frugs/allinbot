@@ -99,11 +99,14 @@ class Sc2LadderInfoHandler(Handler):
             # region stats for the current season.
             if current_season_games_played and regions:
 
+                current_season_id = -1
+                for region_stats in regions.values():
+                    current_season_id = max([current_season_id] + list(map(int, region_stats.keys())))
+
                 message_to_send += "\n"
 
                 for region, region_stats in order_by_highest_league_then_most_played(regions.items()):
-                    current_season_key = next(iter(sorted(list(region_stats.keys()), key=lambda x: int(x), reverse=True)), "-1")
-                    current_season_stats = region_stats.get(current_season_key)
+                    current_season_stats = region_stats.get(str(current_season_id))
                     if current_season_stats:
 
                         message_to_send += "__{} Region Stats__\n\n".format(region.upper())
