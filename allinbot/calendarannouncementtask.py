@@ -115,8 +115,9 @@ class CalendarAnnouncementTask(Task):
 
                 messages_to_send.append(announcement_message)
 
-            channel = client.get_channel(_ANNOUNCEMENT_CHANNEL_ID)
-            await client.send_message(channel, "\n".join(messages_to_send))
+            if client.is_logged_in():
+                channel = client.get_channel(_ANNOUNCEMENT_CHANNEL_ID)
+                await client.send_message(channel, "\n".join(messages_to_send))
 
             self._five_minute_announced_events = dict(filter(lambda x: x[1] >= now, self._five_minute_announced_events.items()))
             self._thirty_minute_announced_events = dict(filter(lambda x: x[1] >= now, self._thirty_minute_announced_events.items()))
