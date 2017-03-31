@@ -15,7 +15,7 @@ class TrialPeriodReminderTask(Task):
         self.reminder_mention = reminder_mention
 
     async def perform_task(self, client: discord.Client):
-        if client.is_logged_in():
+        if client.is_logged_in:
             trial_finished_members = [
                 member
                 for member
