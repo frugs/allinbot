@@ -15,7 +15,7 @@ class TrialPeriodReminderTask(Task):
         self.reminder_mention = reminder_mention
 
     async def perform_task(self, client: discord.Client):
-        if client.is_logged_in:
+        if client.is_logged_in and not client.is_closed:
             trial_finished_members = [
                 member
                 for member
@@ -33,7 +33,7 @@ class TrialPeriodReminderTask(Task):
                 channel = client.get_channel(self.reminder_channel_id)
 
                 # fixme: seems like we can sometimes be logged in but not fully connected to server (so no channel list)
-                if channel:
+                if channel and client.is_logged_in and not client.is_closed:
                     await client.send_message(channel, message)
 
     @staticmethod

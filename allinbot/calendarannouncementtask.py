@@ -115,7 +115,7 @@ class CalendarAnnouncementTask(Task):
 
                 messages_to_send.append(announcement_message)
 
-            if client.is_logged_in:
+            if client.is_logged_in and not client.is_closed:
                 channel = client.get_channel(_ANNOUNCEMENT_CHANNEL_ID)
                 await client.send_message(channel, "\n".join(messages_to_send))
 
