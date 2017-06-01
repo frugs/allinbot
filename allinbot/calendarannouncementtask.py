@@ -55,6 +55,10 @@ class CalendarAnnouncementTask(Task):
                     parsed_rrule = dateutil.rrule.rrulestr(component["RRULE"].to_ical().decode(), dtstart=start_time)
                     start_time = parsed_rrule.after(now)
 
+                # there may be no more valid start times for recurring events after the present time
+                if not start_time:
+                    continue
+
                 event = (start_time, component)
 
                 if now < start_time <= five_minutes_time and component["UID"] not in self._five_minute_announced_events:
