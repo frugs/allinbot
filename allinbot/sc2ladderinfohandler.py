@@ -1,7 +1,7 @@
-import re
 import datetime
+import re
 import typing
-import itertools
+
 import discord
 import pyrebase
 

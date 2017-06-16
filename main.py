@@ -46,6 +46,8 @@ def main():
 
     bot.register_handler(allinbot.Sc2LadderInfoHandler(db_config))
 
+    bot.register_handler(allinbot.QueenInjectEfficiencyHandler())
+
     calendar_announcement_task = allinbot.CalendarAnnouncementTask()
 
     web_app = growler.App('allinbot_controller', loop=event_loop)
