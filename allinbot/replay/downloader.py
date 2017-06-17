@@ -7,11 +7,13 @@ from sc2reader.resources import Replay
 
 CHUNK_SIZE = 1024
 
-SC2REPLAYSTATS_PATTERN = re.compile(r'http[s]?:\/\/sc2replaystats\.com\/download\/\d+')
+SC2REPLAYSTATS_PATTERN = re.compile(r'^http[s]?:\/\/sc2replaystats\.com\/download\/\d+$')
+GGTRACKER_PATTERN = re.compile(r'^http[s]?:\/\/ggtracker\.com\/matches\/\d+\/replay$')
+SPAWNINGTOOL_PATTERN = re.compile(r'^http[s]?:\/\/lotv\.spawningtool\.com\/\d+\/download[\/]?$')
 
 
 def is_valid_replay_link(link: str) -> bool:
-    return SC2REPLAYSTATS_PATTERN.match(link)
+    return any(pattern.match(link) for pattern in [SC2REPLAYSTATS_PATTERN, GGTRACKER_PATTERN, SPAWNINGTOOL_PATTERN])
 
 async def download_and_load_replay(link: str) -> Replay:
     with tempfile.TemporaryFile() as replay_file:
