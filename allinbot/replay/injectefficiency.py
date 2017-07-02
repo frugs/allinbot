@@ -1,8 +1,9 @@
+import base64
 import json
+import gzip
 import urllib.parse
 
 import techlabreactor
-
 from sc2reader.objects import Player
 from sc2reader.resources import Replay
 
@@ -36,4 +37,7 @@ def generate_inject_efficiency_page_data_for_player(player: Player, replay: Repl
         "injectEfficiencyFromFirstQueenCompleted": inject_efficiency_from_first_queen_completed_str,
         "playerName": player.name
     })
-    return urllib.parse.quote(json_string)
+
+    compressed_and_encoded_json_string = base64.b64encode(gzip.compress(json_string.encode())).decode()
+
+    return urllib.parse.quote(compressed_and_encoded_json_string)
