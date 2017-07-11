@@ -38,7 +38,7 @@ def generate_inject_efficiency_page_data_for_player(player: Player, replay: Repl
         "overallInjectEfficiency": overall_inject_efficiency_str,
         "injectEfficiencyFromFirstQueenCompleted": inject_efficiency_from_first_queen_completed_str,
         "playerName": player.name,
-        "inject_pops": inject_pops
+        "injectPops": inject_pops
     })
 
     compressed_and_encoded_json_string = base64.b64encode(gzip.compress(json_string.encode())).decode()
