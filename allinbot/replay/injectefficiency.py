@@ -31,11 +31,14 @@ def generate_inject_efficiency_page_data_for_player(player: Player, replay: Repl
         inject_states)
     inject_efficiency_from_first_queen_completed_str = "{0:.2f}".format(inject_efficiency_from_first_queen_completed * 100)
 
+    inject_pops = techlabreactor.get_inject_pops_for_player(player, replay)
+
     json_string = json.dumps({
         "chartData": chart_data,
         "overallInjectEfficiency": overall_inject_efficiency_str,
         "injectEfficiencyFromFirstQueenCompleted": inject_efficiency_from_first_queen_completed_str,
-        "playerName": player.name
+        "playerName": player.name,
+        "inject_pops": inject_pops
     })
 
     compressed_and_encoded_json_string = base64.b64encode(gzip.compress(json_string.encode())).decode()
