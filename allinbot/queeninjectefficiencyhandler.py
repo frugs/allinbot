@@ -39,7 +39,7 @@ class QueenInjectEfficiencyHandler(Handler):
 
         for player in zerg_players:
             page_data = generate_inject_efficiency_page_data_for_player(player, replay)
-            inject_plot_link = "http://allinbot.cloudapp.net/inject-plot/?data=" + page_data
+            inject_plot_link = "http://allinbot.cloudapp.net/inject-plot/analysis.html?data=" + page_data
 
             async with aiohttp.ClientSession() as session:
                 headers = {
