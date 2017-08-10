@@ -1,7 +1,7 @@
 from typing import List
 
-from sc2reader.resources import Replay
 from sc2reader.objects import Player
+from sc2reader.resources import Replay
 
 
 def list_zerg_players(replay: Replay) -> List[Player]:

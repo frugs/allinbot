@@ -1,14 +1,17 @@
 import os
+import tempfile
 
-import discord
 import aiohttp
+import discord
+import sc2reader
 
 from allinbot.handler import Handler
-from .replay import is_valid_replay_link, download_and_load_replay, list_zerg_players, generate_inject_efficiency_page_data_for_player
+from .replay import is_valid_replay_link, list_zerg_players
 
 TRIGGER = "!injects "
 TRIGGER_ALT = "!injectefficiency "
 TRIM_API_KEY = os.getenv("TRIM_API_KEY", "")
+CHUNK_SIZE = 1024
 
 
 class QueenInjectEfficiencyHandler(Handler):
@@ -19,13 +22,26 @@ class QueenInjectEfficiencyHandler(Handler):
         return message.content.startswith(TRIGGER) or message.content.startswith(TRIGGER_ALT)
 
     async def handle_message(self, client: discord.Client, message: discord.Message):
-        link = message.content[len(TRIGGER):]
+        replay_url = message.content[len(TRIGGER):]
 
-        if not is_valid_replay_link(link):
+        if not is_valid_replay_link(replay_url):
             await client.send_message(message.channel, "Invalid replay link.")
             return
 
-        replay = await download_and_load_replay(link)
+        _, replay_path = tempfile.mkstemp(suffix=".SC2Replay")
+
+        replay_file = open(replay_path, mode="w+b")
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(replay_url) as resp:
+                while True:
+                    chunk = await resp.content.read(CHUNK_SIZE)
+                    if not chunk:
+                        break
+
+                    replay_file.write(chunk)
+
+        replay = sc2reader.load_replay(replay_file)
 
         if replay.build < 53644 or replay.expansion != "LotV":
             await client.send_message(message.channel, "Replay unsupported.")
@@ -37,20 +53,22 @@ class QueenInjectEfficiencyHandler(Handler):
             await client.send_message(message.channel, "No Zerg players in replay!")
             return
 
-        for player in zerg_players:
-            page_data = generate_inject_efficiency_page_data_for_player(player, replay)
-            inject_plot_link = "http://allinbot.cloudapp.net/inject-plot/analysis.html?data=" + page_data
+        replay_file.seek(0)
 
-            async with aiohttp.ClientSession() as session:
-                headers = {
-                    "x-api-key": TRIM_API_KEY
-                }
-                data = {
-                    "longUrl": inject_plot_link,
-                }
-                async with session.post("https://tr.im/links", data=data, headers=headers) as resp:
-                    response_content = await resp.json()
+        async with aiohttp.ClientSession() as session:
+            post_url = "http://allinbot.cloudapp.net/inject-plot/upload"
+            form_data = aiohttp.FormData()
+            form_data.add_field(
+                "file",
+                replay_file,
+                filename=replay_url,
+                content_type="application/octet-stream")
+            async with session.post(post_url, data=form_data) as resp:
+                if resp.status == 200:
+                    inject_plot_url = str(resp.url)
+                    await client.send_message(message.channel, "Queen Inject Efficiency Visualiser - " + inject_plot_url)
 
-            await client.send_message(message.channel, player.name + " - " + response_content["url"])
+        replay_file.close()
+        os.remove(replay_path)
 
 

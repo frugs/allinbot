@@ -1,3 +1,2 @@
-from .downloader import is_valid_replay_link, download_and_load_replay
-from .injectefficiency import generate_inject_efficiency_page_data_for_player
+from .downloader import is_valid_replay_link
 from .raceutils import list_zerg_players
