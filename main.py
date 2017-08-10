@@ -24,7 +24,7 @@ def main():
     bot.register_handler(allinbot.PingPongHandler("!whoisthebestontheteam", "<@!169598177714896897>"))
     bot.register_handler(allinbot.PingPongHandler(
         "!analysis",
-        "Zerg Macro Training Assistant - http://allinbot.cloudapp.net/training-assistant/\n"
+        "Zerg Macro Training Assistant - http://allinbot.cloudapp.net/training-assistant/upload/\n"
         "Zerg Queen Inject Efficiency Visualiser - http://allinbot.cloudapp.net/inject-plot/\n"
         "Terran Production Efficiency Visualiser - http://allinbot.cloudapp.net/terran-production/\n",
         "!analysis - displays links to replay analysis utilities."
