@@ -26,7 +26,7 @@ class ChooseMapHandler(Handler):
         random_map = random.choice(MAPS)
         await client.send_message(message.channel, random_map)
 
-    def description(self):
+    async def description(self, client):
         return "!choosemap - Suggests a random 1v1 Ladder map"
 
 
@@ -42,5 +42,5 @@ class MapPoolHandler(Handler):
         maps = "\n".join(MAPS)
         await client.send_message(message.channel, maps)
 
-    def description(self):
+    async def description(self, client):
         return "!mappool - Prints the current 1v1 Ladder map pool"

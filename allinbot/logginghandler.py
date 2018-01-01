@@ -32,5 +32,5 @@ class LoggingHandler(Handler):
         with open(self.log_filename, "a") as log_file:
             log_file.write(json.dumps(log) + "\n")
 
-    def description(self):
+    async def description(self, client):
         return ""

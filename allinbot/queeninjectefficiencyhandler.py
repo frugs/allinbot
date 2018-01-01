@@ -15,7 +15,7 @@ CHUNK_SIZE = 1024
 
 
 class QueenInjectEfficiencyHandler(Handler):
-    def description(self) -> str:
+    async def description(self, client) -> str:
         return TRIGGER + "{link_to_replay} - show queen inject efficiency diagram for replay."
 
     def can_handle_message(self, message: discord.Message) -> bool:

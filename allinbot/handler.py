@@ -20,7 +20,7 @@ class Handler:
         """
         raise NotImplementedError("handlers must implement this")
 
-    def description(self) -> str:
+    async def description(self, client: discord.Client) -> str:
         """
         Should return a user friendly description detailing how this handler is used, shown to the user.
         """

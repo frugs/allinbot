@@ -39,5 +39,5 @@ class PingRandomPongHandler(Handler):
 
         await selected_handler.handle_message(client, message)
 
-    def description(self):
+    async def description(self, client):
         return self.desc

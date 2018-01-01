@@ -66,5 +66,5 @@ class TimeZoneConversionHandler(Handler):
             await client.send_message(
                 message.channel, str(e) + "\nUsage: !timezone {time} {from_timezone} to {to_timezone}")
 
-    def description(self) -> str:
+    async def description(self, client) -> str:
         return "!timezone {time} {from_timezone} to {to_timezone}"

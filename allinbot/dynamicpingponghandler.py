@@ -1,3 +1,5 @@
+from asyncio import AbstractEventLoop
+
 import discord
 import pyrebase
 
@@ -5,7 +7,7 @@ from .handler import Handler
 from .database import DatabaseTask, perform_database_task
 
 
-class MatchTriggerToResponseTask(DatabaseTask[str]):
+class RetrieveResponseForTriggerTask(DatabaseTask[str]):
 
     def __init__(self, db_config: dict, trigger: str):
         super().__init__(db_config)
@@ -16,6 +18,20 @@ class MatchTriggerToResponseTask(DatabaseTask[str]):
         if trigger_response_data:
             return trigger_response_data.get("response", "")
 
+
+class RetrieveTriggerHelpTexts(DatabaseTask[str]):
+
+    def execute_with_database(self, db: pyrebase.pyrebase.Database) -> str:
+        res = []
+
+        data = db.child("triggers").get().val()
+        if data:
+            for _, response_data in data.items():
+                help = response_data.get("help", "")
+                if help:
+                    res.append(help)
+
+        return "\n".join(res)
 
 class DynamicPingPongHandler(Handler):
 
@@ -28,14 +44,18 @@ class DynamicPingPongHandler(Handler):
 
     async def handle_message(self, client: discord.Client, message: discord.Message):
         trigger = message.content[1:]
-        response = await self._match_trigger_to_response(client, trigger)
+        response = await self._retrieve_response_for_trigger(client.loop, trigger)
 
         if response:
             await client.send_message(message.channel, response)
 
-    def description(self) -> str:
-        pass
+    async def description(self, client: discord.Client) -> str:
+         return await self._retrieve_help_texts(client.loop)
 
-    async def _match_trigger_to_response(self, client: discord.Client, trigger: str) -> str:
-        task = MatchTriggerToResponseTask(self.db_config, trigger)
-        return await perform_database_task(client.loop, task)
+    async def _retrieve_response_for_trigger(self, event_loop: AbstractEventLoop, trigger: str) -> str:
+        task = RetrieveResponseForTriggerTask(self.db_config, trigger)
+        return await perform_database_task(event_loop, task)
+
+    async def _retrieve_help_texts(self, event_loop: AbstractEventLoop) -> str:
+        task = RetrieveTriggerHelpTexts(self.db_config)
+        return await perform_database_task(event_loop, task)

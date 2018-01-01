@@ -127,7 +127,7 @@ class Sc2LadderInfoHandler(Handler):
 
         await client.send_message(message.channel, message_to_send)
 
-    def description(self) -> str:
+    async def description(self, client) -> str:
         return _TRIGGER + " {@mention} - retrieves registered user's sc2 ladder info"
 
     def can_handle_message(self, message: discord.Message) -> bool:

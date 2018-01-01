@@ -45,7 +45,7 @@ class RaceMentionHandler(Handler):
     def can_handle_message(self, message: discord.Message) -> bool:
         return message.server and (message.content.casefold() == "@{}".format(self._race.lower()).casefold() or re.match(self._matcher, message.content))
 
-    def description(self) -> str:
+    async def description(self, client) -> str:
         return "@" + self._race.lower() + " *{message}* - @mention members who play " + self._race + " with {message}"
 
 
