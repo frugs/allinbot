@@ -11,4 +11,5 @@ from allinbot.racementionhandlers import zerg_mention_handler, protoss_mention_h
 from allinbot.battletagregistrationhandler import BattleTagRegistrationHandler
 from allinbot.sc2ladderinfohandler import Sc2LadderInfoHandler
 from allinbot.queeninjectefficiencyhandler import QueenInjectEfficiencyHandler
+from allinbot.dynamicpingponghandler import DynamicPingPongHandler
 import allinbot.database

@@ -55,6 +55,8 @@ def main():
 
     bot.register_handler(allinbot.QueenInjectEfficiencyHandler())
 
+    bot.register_handler(allinbot.DynamicPingPongHandler(db_config))
+
     calendar_announcement_task = allinbot.CalendarAnnouncementTask()
 
     web_app = growler.App('allinbot_controller', loop=event_loop)
