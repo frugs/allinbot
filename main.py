@@ -20,16 +20,6 @@ def main():
     client = discord.Client(loop=event_loop)
     bot = allinbot.Bot(token, client)
 
-    bot.register_handler(allinbot.PingPongHandler("!test", "test!", ""))
-    bot.register_handler(allinbot.PingPongHandler("!whoisthebestontheteam", "<@!169598177714896897>"))
-    bot.register_handler(allinbot.PingPongHandler(
-        "!analysis",
-        "Zerg Macro Training Assistant - http://allinbot.cloudapp.net/training-assistant/upload/\n"
-        "Zerg Queen Inject Efficiency Visualiser - http://allinbot.cloudapp.net/inject-plot/\n"
-        "Terran Production Efficiency Visualiser - http://allinbot.cloudapp.net/terran-production/\n",
-        "!analysis - displays links to replay analysis utilities."
-    ))
-
     lobster_handler = allinbot.PingRandomPongHandler(
         "!bringoutthedancinglobsters",
         [
@@ -48,8 +38,6 @@ def main():
     bot.register_handler(allinbot.protoss_mention_handler(db_config))
     bot.register_handler(allinbot.terran_mention_handler(db_config))
     bot.register_handler(allinbot.random_mention_handler(db_config))
-
-    bot.register_handler(allinbot.BattleTagRegistrationHandler(db_config))
 
     bot.register_handler(allinbot.Sc2LadderInfoHandler(db_config))
 
@@ -85,6 +73,7 @@ def main():
     finally:
         event_loop.run_until_complete(bot.stop())
         event_loop.stop()
+
 
 if __name__ == '__main__':
     main()
