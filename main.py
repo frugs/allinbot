@@ -28,9 +28,6 @@ def main():
         ])
     bot.register_handler(lobster_handler)
 
-    bot.register_handler(allinbot.ChooseMapHandler())
-    bot.register_handler(allinbot.MapPoolHandler())
-
     bot.register_handler(allinbot.TimeZoneConversionHandler())
 
     db_config = allinbot.database.load_db_config(firebase_config_path)
