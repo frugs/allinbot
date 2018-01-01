@@ -46,7 +46,9 @@ class Bot:
 
     @staticmethod
     async def _describe_handlers(client: discord.Client, message: discord.Message, handlers: Iterable[Handler]):
-        descriptions = [await handler.description(client) for handler in handlers]
+        descriptions = []
+        for handler in handlers:
+            descriptions.append(await handler.description(client))
         combined_description = "\n".join(descriptions)
         await client.send_message(message.channel, combined_description)
 
