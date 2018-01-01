@@ -21,7 +21,7 @@ def main():
     bot = allinbot.Bot(token, client)
 
     bot.register_handler(allinbot.PingPongHandler("!test", "test!", ""))
-    bot.register_handler(allinbot.PingPongHandler("!whoisthebestontheteam", "<@!93062148619538432>"))
+    bot.register_handler(allinbot.PingPongHandler("!whoisthebestontheteam", "<@!169598177714896897>"))
     bot.register_handler(allinbot.PingPongHandler(
         "!analysis",
         "Zerg Macro Training Assistant - http://allinbot.cloudapp.net/training-assistant/upload/\n"
