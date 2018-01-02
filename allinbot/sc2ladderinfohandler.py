@@ -36,20 +36,6 @@ class RetrieveLadderInfoDatabaseTask(DatabaseTask[dict]):
         return query_result.val()
 
 
-def order_by_highest_league_then_most_played(regions: typing.Iterable):
-    def key(region: tuple):
-        region_id, region_data = region
-
-        if "current" not in region_data:
-            return 0, 0
-
-        races = region_data["current"].values()
-        return max(race.get("league_id", 0) for race in races), sum(race.get("games_played", 0) for race in races)
-
-    region_list = list(regions)
-    return sorted(region_list, key=key, reverse=True)
-
-
 class Sc2LadderInfoHandler(Handler):
 
     def __init__(self, db_config: dict):
@@ -93,42 +79,10 @@ class Sc2LadderInfoHandler(Handler):
             if previous_season_games_played is not None:
                 message_to_send += "Total games played last season: {}\n".format(previous_season_games_played)
 
-            regions = ladder_info.get("regions")
-
-            # Only show region stats if the player has been active this season. This extra guard ensures we only show
-            # region stats for the current season.
-            if current_season_games_played and regions:
-
-                current_season_id = -1
-                for region_stats in regions.values():
-                    current_season_id = max([current_season_id] + list(map(int, region_stats.keys())))
-
-                message_to_send += "\n"
-
-                for region, region_stats in order_by_highest_league_then_most_played(regions.items()):
-                    current_season_stats = region_stats.get(str(current_season_id))
-                    if current_season_stats:
-
-                        message_to_send += "__{} Region Stats__\n\n".format(region.upper())
-                        for race in _RACES:
-
-                            if race in current_season_stats:
-                                message_to_send += "*{}*\n".format(race)
-                                race_stats = current_season_stats[race]
-                                league_emblem = _LEAGUE_EMBLEMS[(race_stats.get("league_id", 0))]
-                                message_to_send += "League: {}\n".format(league_emblem)
-                                message_to_send += "MMR: {}\n".format(race_stats.get("mmr", 0))
-                                message_to_send += "Games played: {}\n".format(race_stats.get("games_played", 0))
-                                message_to_send += "Wins: {}\n".format(race_stats.get("wins", 0))
-                                message_to_send += "Losses: {}\n".format(race_stats.get("losses", 0))
-                                message_to_send += "Ties: {}\n".format(race_stats.get("ties", 0))
-
-                                message_to_send += "\n"
-
         await client.send_message(message.channel, message_to_send)
 
     async def description(self, client) -> str:
         return _TRIGGER + " {@mention} - retrieves registered user's sc2 ladder info"
 
     def can_handle_message(self, message: discord.Message) -> bool:
-        return re.match(_PATTERN, message.content)
+        return bool(re.match(_PATTERN, message.content))
