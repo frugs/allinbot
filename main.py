@@ -1,7 +1,8 @@
 import os
 import asyncio
+import aiohttp
+import aiohttp.web
 import discord
-import growler
 import allinbot
 
 
@@ -44,21 +45,26 @@ def main():
 
     calendar_announcement_task = allinbot.CalendarAnnouncementTask()
 
-    web_app = growler.App('allinbot_controller', loop=event_loop)
+    async def general_announce(request: aiohttp.web.Request) -> aiohttp.web.Response:
+        data = await request.json()
 
-    @web_app.get('/trial_reminder')
-    def trial_reminder(req, res):
-        bot.schedule_task(allinbot.TrialPeriodReminderTask("233736236379013121", ""))
-        res.send_text("Trial reminder scheduled")
+        channel_id = data.get("channel_id", "")
+        message = data.get("message", "")
 
-    @web_app.get('/calendar_announce')
-    def calendar_announce(req, res):
-        bot.schedule_task(calendar_announcement_task)
-        res.send_text("Calendar announcement scheduled")
+        if channel_id and message:
+            bot.schedule_task(allinbot.GeneralAnnouncementTask(channel_id, message))
+
+        return aiohttp.web.HTTPOk()
 
     try:
         asyncio.ensure_future(bot.start(), loop=event_loop)
-        asyncio.Server = web_app.create_server(port=8081)
+
+        app = aiohttp.web.Application()
+        app.router.add_post('', general_announce)
+
+        future = event_loop.create_server(app.make_handler(), host="localhost", port=40862)
+        event_loop.run_until_complete(future)
+
         event_loop.run_forever()
 
         print("event loop finished.")

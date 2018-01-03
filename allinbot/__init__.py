@@ -10,4 +10,5 @@ from allinbot.racementionhandlers import zerg_mention_handler, protoss_mention_h
 from allinbot.sc2ladderinfohandler import Sc2LadderInfoHandler
 from allinbot.queeninjectefficiencyhandler import QueenInjectEfficiencyHandler
 from allinbot.dynamicpingponghandler import DynamicPingPongHandler
+from allinbot.generalannouncementtask import GeneralAnnouncementTask
 import allinbot.database

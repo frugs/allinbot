@@ -1,7 +1,6 @@
 pyrebase
 pytz
 discord.py
-growler
 icalendar
 techlabreactor
 sc2reader
