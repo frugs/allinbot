@@ -79,6 +79,8 @@ class Sc2LadderInfoHandler(Handler):
             if previous_season_games_played is not None:
                 message_to_send += "Total games played last season: {}\n".format(previous_season_games_played)
 
+            message_to_send += "\nFurther information at: https://apps.allinspirationpro.com/ladderinfo/" + discord_id
+
         await client.send_message(message.channel, message_to_send)
 
     async def description(self, client) -> str:
