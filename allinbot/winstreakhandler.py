@@ -12,10 +12,26 @@ _TRIGGER = "!winstreaks"
 _ALT_TRIGGER = "!winstreak"
 
 
-class FetchMembersDatabaseTask(DatabaseTask[List[str]]):
+def extract_win_streaks_for_characters(characters: dict):
+    characters = itertools.chain.from_iterable(x.values() for x in characters.values())
+
+    def map_characters_to_win_streaks(character: dict) -> int:
+        ladder_info = character.get("ladder_info", {})
+        sorted_seasons = list(sorted(ladder_info.keys(), reverse=True))
+        if sorted_seasons:
+            race_win_streaks = (x.get("current_win_streak", 0) for x in ladder_info[sorted_seasons[0]].values())
+            return max(race_win_streaks, default=0)
+        else:
+            return 0
+
+    character_win_streaks = list(map(map_characters_to_win_streaks, characters))
+    return max(character_win_streaks, default=0)
+
+
+class FetchMemberIdsDatabaseTask(DatabaseTask[List[str]]):
 
     def execute_with_database(self, db: pyrebase.pyrebase.Database) -> List[str]:
-        members = db.child("members").shallow().get().val()
+        members = db.child("members").get().val()
         return members if members else []
 
 
@@ -26,23 +42,18 @@ class FetchWinStreaksDatabaseTask(DatabaseTask[List[Tuple[str, int]]]):
         self.member = member
 
     def execute_with_database(self, db: pyrebase.pyrebase.Database) -> Tuple[str, int]:
-        regions = db.child("members").child(self.member).child("characters").get().val()
-        if not regions:
-            regions = {}
+        characters = db.child("members").child(self.member).child("characters").get().val()
+        if not characters:
+            characters = {}
 
-        characters = itertools.chain.from_iterable(x.values() for x in regions.values())
+        return self.member, extract_win_streaks_for_characters(characters)
 
-        def map_characters_to_win_streaks(character: dict) -> int:
-            ladder_info = character.get("ladder_info", {})
-            sorted_seasons = list(sorted(ladder_info.keys(), reverse=True))
-            if sorted_seasons:
-                race_win_streaks = (x.get("current_win_streak", 0) for x in ladder_info[sorted_seasons[0]].values())
-                return max(race_win_streaks, default=0)
-            else:
-                return 0
 
-        character_win_streaks = list(map(map_characters_to_win_streaks, characters))
-        return self.member, max(character_win_streaks, default=0)
+class FetchAllMembersDatabaseTask(DatabaseTask[dict]):
+
+    def execute_with_database(self, db: pyrebase.pyrebase.Database) -> dict:
+        members = db.child("members").get().val()
+        return members if members else {}
 
 
 class WinStreakHandler(Handler):
@@ -57,16 +68,28 @@ class WinStreakHandler(Handler):
     async def handle_message(self, client: discord.Client, message: discord.Message):
         self.rate_limited = True
 
-        members = await perform_database_task(client.loop, FetchMembersDatabaseTask(self.db_config))
+        members_ids = await perform_database_task(client.loop, FetchMemberIdsDatabaseTask(self.db_config))
 
-        def fetch_win_streaks(member: str):
-            db_task = FetchWinStreaksDatabaseTask(self.db_config, member)
-            return db_task.execute_with_database(open_db_connection(self.db_config))
+        if len(members_ids) < 300:
+            # There aren't too many so just fetch the whole lot, this will be faster
+            members = await perform_database_task(client.loop, FetchAllMembersDatabaseTask(self.db_config))
+            member_characters = [
+                (member_id, member_data.get("characters", {}))
+                for member_id, member_data
+                in members.items()]
+            win_streaks = [
+                (member_id, extract_win_streaks_for_characters(characters))
+                for member_id, characters
+                in member_characters]
+        else:
+            def fetch_win_streaks(member: str):
+                db_task = FetchWinStreaksDatabaseTask(self.db_config, member)
+                return db_task.execute_with_database(open_db_connection(self.db_config))
 
-        with concurrent.futures.ThreadPoolExecutor(32) as pool:
-            fs = [pool.submit(fetch_win_streaks, member) for member in members]
-            completed_fs, _ = await client.loop.run_in_executor(None, concurrent.futures.wait, fs)
-            win_streaks = [f.result() for f in completed_fs]
+            with concurrent.futures.ThreadPoolExecutor(32) as pool:
+                fs = [pool.submit(fetch_win_streaks, member) for member in members_ids]
+                completed_fs, _ = await client.loop.run_in_executor(None, concurrent.futures.wait, fs)
+                win_streaks = [f.result() for f in completed_fs]
 
         win_streaks.sort(key=lambda x: x[1], reverse=True)
         win_streaks = win_streaks[:5]
