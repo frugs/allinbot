@@ -11,4 +11,5 @@ from allinbot.sc2ladderinfohandler import Sc2LadderInfoHandler
 from allinbot.queeninjectefficiencyhandler import QueenInjectEfficiencyHandler
 from allinbot.dynamicpingponghandler import DynamicPingPongHandler
 from allinbot.generalannouncementtask import GeneralAnnouncementTask
+from allinbot.istwitchstreamlivehandler import IsTwitchStreamLiveHandler
 import allinbot.database

@@ -9,6 +9,7 @@ import allinbot
 def main():
     token = os.environ.get('BOT_TOKEN')
     firebase_config_path = os.getenv('FIREBASE_CONFIG_PATH', 'firebase.cfg')
+    twitch_client_id = os.getenv('TWITCH_CLIENT_ID')
 
     if not token:
         raise Exception("Could not resolve bot token")
@@ -43,7 +44,7 @@ def main():
 
     bot.register_handler(allinbot.DynamicPingPongHandler(db_config))
 
-    calendar_announcement_task = allinbot.CalendarAnnouncementTask()
+    bot.register_handler(allinbot.IsTwitchStreamLiveHandler(db_config, twitch_client_id))
 
     async def general_announce(request: aiohttp.web.Request) -> aiohttp.web.Response:
         data = await request.json()
