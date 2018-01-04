@@ -1,3 +1,4 @@
+import os
 import typing
 import re
 import discord
@@ -5,6 +6,8 @@ import pyrebase
 
 from .database import perform_database_task, DatabaseTask
 from .handler import Handler
+
+ALLIN_MEMBER_ROLE_ID = os.getenv("ALLIN_MEMBER_ROLE_ID")
 
 
 class QueryRacePlayerDiscordIdsDatabaseTask(DatabaseTask[typing.List[str]]):
@@ -34,7 +37,8 @@ class RaceMentionHandler(Handler):
         server_members = filter(None, [message.server.get_member(discord_id) for discord_id in ids])
         online_server_members = [
             member for member in server_members
-            if member.status == discord.Status.online or member.status == discord.Status.idle]
+            if any(role for role in member.roles if role.id == ALLIN_MEMBER_ROLE_ID) and (
+                    member.status == discord.Status.online or member.status == discord.Status.idle)]
         mentions = ", ".join([member.mention for member in online_server_members])
 
         match = re.match(self._matcher, message.content)

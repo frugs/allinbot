@@ -1,5 +1,6 @@
 import concurrent.futures
 import itertools
+import os
 from typing import List, Tuple
 
 import discord
@@ -7,6 +8,8 @@ import pyrebase
 
 from allinbot.database import DatabaseTask, open_db_connection, perform_database_task
 from allinbot.handler import Handler
+
+ALLIN_MEMBER_ROLE_ID = os.getenv("ALLIN_MEMBER_ROLE_ID", "")
 
 _TRIGGER = "!winstreaks"
 _ALT_TRIGGER = "!winstreak"
@@ -91,13 +94,29 @@ class WinStreakHandler(Handler):
                 completed_fs, _ = await client.loop.run_in_executor(None, concurrent.futures.wait, fs)
                 win_streaks = [f.result() for f in completed_fs]
 
+        def is_allin_member(discord_id: str) -> bool:
+            member = message.server.get_member(discord_id)
+            if not member:
+                return False
+
+            return any(role for role in member.roles if role.id == ALLIN_MEMBER_ROLE_ID)
+
+        win_streaks = [
+            (discord_id, win_streak)
+            for discord_id, win_streak
+            in win_streaks
+            if win_streak > 1 and is_allin_member(discord_id)]
+
         win_streaks.sort(key=lambda x: x[1], reverse=True)
         win_streaks = win_streaks[:5]
 
         if win_streaks:
             def get_name(discord_id: str) -> str:
                 member = message.server.get_member(discord_id)
-                return member.nick if member.nick else member.name
+                if member:
+                    return member.nick if member.nick else member.name
+                else:
+                    return discord_id
 
             message_lines = [
                 "{} is currently on a {} win streak!".format(get_name(discord_id), win_streak)
