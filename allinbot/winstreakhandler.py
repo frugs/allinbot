@@ -95,8 +95,12 @@ class WinStreakHandler(Handler):
         win_streaks = win_streaks[:5]
 
         if win_streaks:
+            def get_name(discord_id: str) -> str:
+                member = message.server.get_member(discord_id)
+                return member.nick if member.nick else member.name
+
             message_lines = [
-                "<@{}> is currently on a {} win streak!".format(discord_id, win_streak)
+                "{} is currently on a {} win streak!".format(get_name(discord_id), win_streak)
                 for discord_id, win_streak
                 in win_streaks
             ]
