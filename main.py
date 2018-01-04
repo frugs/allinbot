@@ -46,6 +46,8 @@ def main():
 
     bot.register_handler(allinbot.IsTwitchStreamLiveHandler(db_config, twitch_client_id))
 
+    bot.register_handler(allinbot.WinStreakHandler(db_config))
+
     async def general_announce(request: aiohttp.web.Request) -> aiohttp.web.Response:
         data = await request.json()
 
