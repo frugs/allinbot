@@ -1,6 +1,7 @@
 import concurrent.futures
 import itertools
 import os
+import time
 from typing import List, Tuple
 
 import discord
@@ -13,6 +14,7 @@ ALLIN_MEMBER_ROLE_ID = os.getenv("ALLIN_MEMBER_ROLE_ID", "")
 
 _TRIGGER = "!winstreaks"
 _ALT_TRIGGER = "!winstreak"
+_SECONDS_IN_5_DAYS = 432000
 
 
 def extract_win_streaks_for_characters(characters: dict):
@@ -22,7 +24,11 @@ def extract_win_streaks_for_characters(characters: dict):
         ladder_info = character.get("ladder_info", {})
         sorted_seasons = list(sorted(ladder_info.keys(), reverse=True))
         if sorted_seasons:
-            race_win_streaks = (x.get("current_win_streak", 0) for x in ladder_info[sorted_seasons[0]].values())
+            race_win_streaks = (
+                x.get("current_win_streak", 0)
+                for x
+                in ladder_info[sorted_seasons[0]].values()
+                if x.get("last_played_time_stamp", 0) > time.time() - _SECONDS_IN_5_DAYS)
             return max(race_win_streaks, default=0)
         else:
             return 0
