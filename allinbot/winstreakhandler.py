@@ -20,21 +20,35 @@ _SECONDS_IN_5_DAYS = 432000
 def extract_win_streaks_for_characters(characters: dict):
     characters = itertools.chain.from_iterable(x.values() for x in characters.values())
 
-    def map_characters_to_win_streaks(character: dict) -> int:
+    characters = list(characters)
+
+    def map_characters_to_win_streaks(character: dict) -> Tuple[int, int]:
         ladder_info = character.get("ladder_info", {})
         sorted_seasons = list(sorted(ladder_info.keys(), reverse=True))
         if sorted_seasons:
+            current_season_ladder_info = ladder_info[sorted_seasons[0]]
+
             race_win_streaks = (
                 x.get("current_win_streak", 0)
                 for x
-                in ladder_info[sorted_seasons[0]].values()
+                in current_season_ladder_info.values()
                 if x.get("last_played_time_stamp", 0) > time.time() - _SECONDS_IN_5_DAYS)
-            return max(race_win_streaks, default=0)
-        else:
-            return 0
 
-    character_win_streaks = list(map(map_characters_to_win_streaks, characters))
-    return max(character_win_streaks, default=0)
+            race_longest_win_streaks = (
+                x.get("longest_win_streak", 0)
+                for x
+                in current_season_ladder_info.values())
+
+            return max(race_win_streaks, default=0), max(race_longest_win_streaks, default=0)
+        else:
+            return 0, 0
+
+    win_streaks_and_longest_win_streaks = list(map(map_characters_to_win_streaks, characters))
+    if win_streaks_and_longest_win_streaks:
+        character_win_streaks, character_longest_win_streaks = zip(*win_streaks_and_longest_win_streaks)
+        return max(character_win_streaks, default=0), max(character_longest_win_streaks, default=0)
+    else:
+        return 0, 0
 
 
 class FetchMemberIdsDatabaseTask(DatabaseTask[List[str]]):
@@ -44,18 +58,19 @@ class FetchMemberIdsDatabaseTask(DatabaseTask[List[str]]):
         return members if members else []
 
 
-class FetchWinStreaksDatabaseTask(DatabaseTask[List[Tuple[str, int]]]):
+class FetchWinStreaksDatabaseTask(DatabaseTask[List[Tuple[str, int, int]]]):
 
     def __init__(self, db_config: dict, member: str):
         super().__init__(db_config)
         self.member = member
 
-    def execute_with_database(self, db: pyrebase.pyrebase.Database) -> Tuple[str, int]:
+    def execute_with_database(self, db: pyrebase.pyrebase.Database) -> Tuple[str, int, int]:
         characters = db.child("members").child(self.member).child("characters").get().val()
         if not characters:
             characters = {}
 
-        return self.member, extract_win_streaks_for_characters(characters)
+        current_win_streak, longest_win_streak = extract_win_streaks_for_characters(characters)
+        return self.member, current_win_streak, longest_win_streak
 
 
 class FetchAllMembersDatabaseTask(DatabaseTask[dict]):
@@ -86,8 +101,8 @@ class WinStreakHandler(Handler):
                 (member_id, member_data.get("characters", {}))
                 for member_id, member_data
                 in members.items()]
-            win_streaks = [
-                (member_id, extract_win_streaks_for_characters(characters))
+            all_win_streaks = [
+                tuple([member_id]) + extract_win_streaks_for_characters(characters)
                 for member_id, characters
                 in member_characters]
         else:
@@ -98,7 +113,7 @@ class WinStreakHandler(Handler):
             with concurrent.futures.ThreadPoolExecutor(32) as pool:
                 fs = [pool.submit(fetch_win_streaks, member) for member in members_ids]
                 completed_fs, _ = await client.loop.run_in_executor(None, concurrent.futures.wait, fs)
-                win_streaks = [f.result() for f in completed_fs]
+                all_win_streaks = [f.result() for f in completed_fs]
 
         def is_allin_member(discord_id: str) -> bool:
             member = message.server.get_member(discord_id)
@@ -107,31 +122,52 @@ class WinStreakHandler(Handler):
 
             return any(role for role in member.roles if role.id == ALLIN_MEMBER_ROLE_ID)
 
+        allin_win_streaks = [x for x in all_win_streaks if is_allin_member(x[0])]
+
         win_streaks = [
             (discord_id, win_streak)
-            for discord_id, win_streak
-            in win_streaks
-            if win_streak > 1 and is_allin_member(discord_id)]
+            for discord_id, win_streak, _
+            in allin_win_streaks
+            if win_streak > 2]
 
         win_streaks.sort(key=lambda x: x[1], reverse=True)
         win_streaks = win_streaks[:5]
 
-        if win_streaks:
-            def get_name(discord_id: str) -> str:
-                member = message.server.get_member(discord_id)
-                if member:
-                    return member.nick if member.nick else member.name
-                else:
-                    return discord_id
+        def get_name(discord_id: str) -> str:
+            member = message.server.get_member(discord_id)
+            if member:
+                return member.nick if member.nick else member.name
+            else:
+                return discord_id
 
-            message_lines = [
+        message_lines = []
+        if win_streaks:
+            message_lines += [
                 "{} is currently on a {} win streak!".format(get_name(discord_id), win_streak)
                 for discord_id, win_streak
                 in win_streaks
             ]
-            await client.send_message(message.channel, "\n".join(message_lines))
         else:
-            await client.send_message(message.channel, "No-one is currently on a win streak.")
+            message_lines.append("No-one is currently on a win streak.")
+    
+        longest_win_streaks = [
+            (discord_id, longest_win_streak)
+            for discord_id, _, longest_win_streak
+            in allin_win_streaks
+            if longest_win_streak > 1]
+
+        longest_win_streaks.sort(key=lambda x: x[1], reverse=True)
+        longest_win_streaks = longest_win_streaks[:3]
+
+        if longest_win_streaks:
+            message_lines += ["", "**Longest Win Streaks This Season**"] + [
+                "{} went on a {} win streak!".format(get_name(discord_id), longest_win_streak)
+                for discord_id, longest_win_streak
+                in longest_win_streaks
+            ]
+
+        if message_lines:
+            await client.send_message(message.channel, "\n".join(message_lines))
 
         self.rate_limited = False
 
