@@ -22,7 +22,7 @@ class QueryRacePlayerDiscordIdsDatabaseTask(DatabaseTask[typing.List[str]]):
         if not query_result.pyres:
             return []
         else:
-            return [member["discord_id"] for member in query_result.val().values()]
+            return [member["discord_id"] for member in query_result.val().values() if 'discord_id' in member]
 
 
 class RaceMentionHandler(Handler):
