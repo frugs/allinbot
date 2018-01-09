@@ -1,4 +1,3 @@
-import concurrent.futures
 import itertools
 import os
 import time
@@ -7,7 +6,7 @@ from typing import List, Tuple
 import discord
 import pyrebase
 
-from allinbot.database import DatabaseTask, open_db_connection, perform_database_task
+from allinbot.database import DatabaseTask, perform_database_task
 from allinbot.handler import Handler
 
 ALLIN_MEMBER_ROLE_ID = os.getenv("ALLIN_MEMBER_ROLE_ID", "")
@@ -58,25 +57,10 @@ class FetchMemberIdsDatabaseTask(DatabaseTask[List[str]]):
         return members if members else []
 
 
-class FetchWinStreaksDatabaseTask(DatabaseTask[List[Tuple[str, int, int]]]):
-
-    def __init__(self, db_config: dict, member: str):
-        super().__init__(db_config)
-        self.member = member
-
-    def execute_with_database(self, db: pyrebase.pyrebase.Database) -> Tuple[str, int, int]:
-        characters = db.child("members").child(self.member).child("characters").get().val()
-        if not characters:
-            characters = {}
-
-        current_win_streak, longest_win_streak = extract_win_streaks_for_characters(characters)
-        return self.member, current_win_streak, longest_win_streak
-
-
-class FetchAllMembersDatabaseTask(DatabaseTask[dict]):
+class FetchAllinMembersDatabaseTask(DatabaseTask[dict]):
 
     def execute_with_database(self, db: pyrebase.pyrebase.Database) -> dict:
-        members = db.child("members").get().val()
+        members = db.child("members").order_by_child("is_full_member").equal_to(True).get().val()
         return members if members else {}
 
 
@@ -92,37 +76,16 @@ class WinStreakHandler(Handler):
     async def handle_message(self, client: discord.Client, message: discord.Message):
         self.rate_limited = True
 
-        members_ids = await perform_database_task(client.loop, FetchMemberIdsDatabaseTask(self.db_config))
+        members = await perform_database_task(client.loop, FetchAllinMembersDatabaseTask(self.db_config))
+        member_characters = [
+            (member_id, member_data.get("characters", {}))
+            for member_id, member_data
+            in members.items()]
 
-        if len(members_ids) < 300:
-            # There aren't too many so just fetch the whole lot, this will be faster
-            members = await perform_database_task(client.loop, FetchAllMembersDatabaseTask(self.db_config))
-            member_characters = [
-                (member_id, member_data.get("characters", {}))
-                for member_id, member_data
-                in members.items()]
-            all_win_streaks = [
-                tuple([member_id]) + extract_win_streaks_for_characters(characters)
-                for member_id, characters
-                in member_characters]
-        else:
-            def fetch_win_streaks(member: str):
-                db_task = FetchWinStreaksDatabaseTask(self.db_config, member)
-                return db_task.execute_with_database(open_db_connection(self.db_config))
-
-            with concurrent.futures.ThreadPoolExecutor(32) as pool:
-                fs = [pool.submit(fetch_win_streaks, member) for member in members_ids]
-                completed_fs, _ = await client.loop.run_in_executor(None, concurrent.futures.wait, fs)
-                all_win_streaks = [f.result() for f in completed_fs]
-
-        def is_allin_member(discord_id: str) -> bool:
-            member = message.server.get_member(discord_id)
-            if not member:
-                return False
-
-            return any(role for role in member.roles if role.id == ALLIN_MEMBER_ROLE_ID)
-
-        allin_win_streaks = [x for x in all_win_streaks if is_allin_member(x[0])]
+        allin_win_streaks = [
+            tuple([member_id]) + extract_win_streaks_for_characters(characters)
+            for member_id, characters
+            in member_characters]
 
         win_streaks = [
             (discord_id, win_streak)
