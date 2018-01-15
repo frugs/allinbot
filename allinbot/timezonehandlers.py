@@ -18,11 +18,11 @@ class TimeZoneConversionHandler(Handler):
 
             match = re.match(self.matcher, message.content)
             from_time_args = match.group(1).split(' ')
-            to_timezone = match.group(2)
+            to_timezone = match.group(2).upper()
 
             if len(from_time_args) >= 2:
                 time = " ".join(from_time_args[0:-1])
-                from_tz_str = from_time_args[-1]
+                from_tz_str = from_time_args[-1].upper()
 
                 for time_format in ["%H:%M", "%H%M", "%I:%M %p", "%I:%M%p", "%I%p", "%I %p"]:
                     try:
