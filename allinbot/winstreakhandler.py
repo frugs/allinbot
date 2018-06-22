@@ -25,29 +25,45 @@ def extract_win_streaks_for_characters(characters: dict):
         ladder_info = character.get("ladder_info", {})
         sorted_seasons = list(sorted(ladder_info.keys(), reverse=True))
         if sorted_seasons:
-            current_season_ladder_info = ladder_info[sorted_seasons[0]]
+            latest_season_ladder_info = ladder_info[sorted_seasons[0]]
+            latest_season = int(sorted_seasons[0])
 
             race_win_streaks = (
                 x.get("current_win_streak", 0)
                 for x
-                in current_season_ladder_info.values()
+                in latest_season_ladder_info.values()
                 if x.get("last_played_time_stamp", 0) > time.time() - _SECONDS_IN_5_DAYS)
 
             race_longest_win_streaks = (
                 x.get("longest_win_streak", 0)
                 for x
-                in current_season_ladder_info.values())
+                in latest_season_ladder_info.values())
 
-            return max(race_win_streaks, default=0), max(race_longest_win_streaks, default=0)
+            return latest_season, max(race_win_streaks, default=0), max(race_longest_win_streaks, default=0)
         else:
-            return 0, 0
+            return 0, 0, 0
 
-    win_streaks_and_longest_win_streaks = list(map(map_characters_to_win_streaks, characters))
+    win_streaks_and_longest_win_streaks = list(
+        map(map_characters_to_win_streaks, characters))
+
     if win_streaks_and_longest_win_streaks:
-        character_win_streaks, character_longest_win_streaks = zip(*win_streaks_and_longest_win_streaks)
-        return max(character_win_streaks, default=0), max(character_longest_win_streaks, default=0)
-    else:
-        return 0, 0
+        seasons, _, _ = zip(*win_streaks_and_longest_win_streaks)
+        latest_season = max(seasons, default=0)
+
+        win_streaks_and_longest_win_streaks = [
+            (season, character_win_streaks, character_longest_win_streaks)
+            for season, character_win_streaks, character_longest_win_streaks in
+            win_streaks_and_longest_win_streaks if season == latest_season
+        ]
+        if win_streaks_and_longest_win_streaks:
+            _, character_win_streaks, character_longest_win_streaks = zip(
+                *win_streaks_and_longest_win_streaks)
+
+            return latest_season, max(
+                character_win_streaks, default=0), max(
+                    character_longest_win_streaks, default=0)
+
+    return 0, 0, 0
 
 
 class FetchMemberIdsDatabaseTask(DatabaseTask[List[str]]):
@@ -87,11 +103,14 @@ class WinStreakHandler(Handler):
             for member_id, characters
             in member_characters]
 
+        _, seasons, _, _ = zip(*allin_win_streaks)
+        latest_season = max(seasons, default=0)
+
         win_streaks = [
             (discord_id, win_streak)
-            for discord_id, win_streak, _
+            for discord_id, season, win_streak, _
             in allin_win_streaks
-            if win_streak > 2]
+            if win_streak > 2 and season == latest_season]
 
         win_streaks.sort(key=lambda x: x[1], reverse=True)
         win_streaks = win_streaks[:5]
@@ -112,12 +131,12 @@ class WinStreakHandler(Handler):
             ]
         else:
             message_lines.append("No-one is currently on a win streak.")
-    
+
         longest_win_streaks = [
             (discord_id, longest_win_streak)
-            for discord_id, _, longest_win_streak
+            for discord_id, season, _, longest_win_streak
             in allin_win_streaks
-            if longest_win_streak > 1]
+            if longest_win_streak > 1 and season == latest_season]
 
         longest_win_streaks.sort(key=lambda x: x[1], reverse=True)
         longest_win_streaks = longest_win_streaks[:3]
