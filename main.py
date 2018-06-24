@@ -6,6 +6,11 @@ import discord
 import allinbot
 
 
+def custom_exception_handler(loop: asyncio.AbstractEventLoop, context: dict):
+    loop.default_exception_handler(context)
+    loop.stop()
+
+
 def main():
     token = os.environ.get('BOT_TOKEN')
     firebase_config_path = os.getenv('FIREBASE_CONFIG_PATH', 'firebase.cfg')
@@ -18,6 +23,7 @@ def main():
         raise Exception("Could not resolve firebase config")
 
     event_loop = asyncio.get_event_loop()
+    event_loop.set_exception_handler(custom_exception_handler)
 
     client = discord.Client(loop=event_loop)
     bot = allinbot.Bot(token, client)
