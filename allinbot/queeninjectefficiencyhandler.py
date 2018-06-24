@@ -19,9 +19,11 @@ class QueenInjectEfficiencyHandler(Handler):
         return TRIGGER + "{link_to_replay} - show queen inject efficiency diagram for replay."
 
     def can_handle_message(self, message: discord.Message) -> bool:
-        return message.content.startswith(TRIGGER) or message.content.startswith(TRIGGER_ALT)
+        return message.content.startswith(
+            TRIGGER) or message.content.startswith(TRIGGER_ALT)
 
-    async def handle_message(self, client: discord.Client, message: discord.Message):
+    async def handle_message(self, client: discord.Client,
+                             message: discord.Message):
         replay_url = message.content[len(TRIGGER):]
 
         if not is_valid_replay_link(replay_url):
@@ -50,7 +52,8 @@ class QueenInjectEfficiencyHandler(Handler):
         zerg_players = list_zerg_players(replay)
 
         if not zerg_players:
-            await client.send_message(message.channel, "No Zerg players in replay!")
+            await client.send_message(message.channel,
+                                      "No Zerg players in replay!")
             return
 
         replay_file.seek(0)
@@ -66,9 +69,10 @@ class QueenInjectEfficiencyHandler(Handler):
             async with session.post(post_url, data=form_data) as resp:
                 if resp.status == 200:
                     inject_plot_url = str(resp.url)
-                    await client.send_message(message.channel, "Queen Inject Efficiency Visualiser - " + inject_plot_url)
+                    await client.send_message(
+                        message.channel,
+                        "Queen Inject Efficiency Visualiser - " +
+                        inject_plot_url)
 
         replay_file.close()
         os.remove(replay_path)
-
-

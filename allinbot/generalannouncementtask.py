@@ -4,7 +4,6 @@ from allinbot import Task
 
 
 class GeneralAnnouncementTask(Task):
-
     def __init__(self, channel_id: str, message: str):
         self.channel_id = channel_id
         self.message = message

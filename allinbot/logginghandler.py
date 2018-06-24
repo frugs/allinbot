@@ -21,7 +21,8 @@ class LoggingHandler(Handler):
     def can_handle_message(self, message: discord.message):
         return True
 
-    async def handle_message(self, client: discord.client, message: discord.message):
+    async def handle_message(self, client: discord.client,
+                             message: discord.message):
         log = {
             "time_sent": int(datetime.datetime.utcnow().timestamp() * 1000),
             "user": message.author.name + "#" + message.author.discriminator,

@@ -3,12 +3,10 @@ import pickle
 import asyncio
 import pyrebase
 
-
 T = typing.TypeVar('T')
 
 
 class DatabaseTask(typing.Generic[T]):
-
     def __init__(self, db_config: dict):
         self._db_config = db_config
 
@@ -32,5 +30,6 @@ def load_db_config(path) -> dict:
         return pickle.load(file)
 
 
-async def perform_database_task(event_loop: asyncio.AbstractEventLoop, task: DatabaseTask[T]) -> T:
+async def perform_database_task(event_loop: asyncio.AbstractEventLoop,
+                                task: DatabaseTask[T]) -> T:
     return await task.perform_task(event_loop)

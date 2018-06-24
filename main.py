@@ -24,10 +24,8 @@ def main():
 
     lobster_handler = allinbot.PingRandomPongHandler(
         "!bringoutthedancinglobsters",
-        [
-            (0.1, "http://i.imgur.com/BMcur.gif"),
-            (0.9, "Sorry, they are all asleep right now.")
-        ])
+        [(0.1, "http://i.imgur.com/BMcur.gif"),
+         (0.9, "Sorry, they are all asleep right now.")])
     bot.register_handler(lobster_handler)
 
     bot.register_handler(allinbot.TimeZoneConversionHandler())
@@ -47,18 +45,21 @@ def main():
 
     bot.register_handler(allinbot.DynamicPingPongHandler(db_config))
 
-    bot.register_handler(allinbot.IsTwitchStreamLiveHandler(db_config, twitch_client_id))
+    bot.register_handler(
+        allinbot.IsTwitchStreamLiveHandler(db_config, twitch_client_id))
 
     bot.register_handler(allinbot.WinStreakHandler(db_config))
 
-    async def general_announce(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    async def general_announce(
+            request: aiohttp.web.Request) -> aiohttp.web.Response:
         data = await request.json()
 
         channel_id = data.get("channel_id", "")
         message = data.get("message", "")
 
         if channel_id and message:
-            bot.schedule_task(allinbot.GeneralAnnouncementTask(channel_id, message))
+            bot.schedule_task(
+                allinbot.GeneralAnnouncementTask(channel_id, message))
 
         return aiohttp.web.HTTPOk()
 
@@ -68,7 +69,8 @@ def main():
         app = aiohttp.web.Application()
         app.router.add_post('', general_announce)
 
-        future = event_loop.create_server(app.make_handler(), host="localhost", port=40862)
+        future = event_loop.create_server(
+            app.make_handler(), host="localhost", port=40862)
         event_loop.run_until_complete(future)
 
         event_loop.run_forever()

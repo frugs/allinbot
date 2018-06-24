@@ -2,8 +2,8 @@ import datetime
 
 
 class CalendarEvent:
-
-    def __init__(self, event_id: str, start_time: datetime.datetime, summary: str):
+    def __init__(self, event_id: str, start_time: datetime.datetime,
+                 summary: str):
         self._event_id = event_id
         self._start_time = start_time
         self._event_summary = summary
