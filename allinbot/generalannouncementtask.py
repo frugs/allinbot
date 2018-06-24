@@ -10,9 +10,5 @@ class GeneralAnnouncementTask(Task):
         self.message = message
 
     async def perform_task(self, client: discord.Client):
-        try:
-            channel = client.get_channel(self.channel_id)
-            await client.send_message(channel, self.message)
-        except Exception as e:
-            print("Ignoring error:")
-            print(e)
+        channel = client.get_channel(self.channel_id)
+        await client.send_message(channel, self.message)
