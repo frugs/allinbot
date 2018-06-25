@@ -4,11 +4,19 @@ import aiohttp
 import aiohttp.web
 import discord
 import allinbot
+import traceback
+import sys
 
 
-def custom_exception_handler(loop: asyncio.AbstractEventLoop, context: dict):
-    loop.default_exception_handler(context)
-    loop.stop()
+def run_coroutine_handle_error(coro, event_loop):
+    async def inner():
+        try:
+            return await coro
+        except Exception as e:
+            traceback.print_exc(file=sys.stdout)
+            event_loop.stop()
+
+    return asyncio.run_coroutine_threadsafe(inner(), event_loop)
 
 
 def main():
@@ -23,7 +31,6 @@ def main():
         raise Exception("Could not resolve firebase config")
 
     event_loop = asyncio.get_event_loop()
-    event_loop.set_exception_handler(custom_exception_handler)
 
     client = discord.Client(loop=event_loop)
     bot = allinbot.Bot(token, client)
@@ -70,14 +77,14 @@ def main():
         return aiohttp.web.HTTPOk()
 
     try:
-        asyncio.ensure_future(bot.start(), loop=event_loop)
+        run_coroutine_handle_error(bot.start(), event_loop)
 
         app = aiohttp.web.Application()
         app.router.add_post('', general_announce)
 
-        future = event_loop.create_server(
-            app.make_handler(), host="localhost", port=40862)
-        event_loop.run_until_complete(future)
+        run_coroutine_handle_error(
+            event_loop.create_server(
+                app.make_handler(), host="localhost", port=40862))
 
         event_loop.run_forever()
 
