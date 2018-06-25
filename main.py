@@ -76,27 +76,16 @@ def main():
 
         return aiohttp.web.HTTPOk()
 
-    try:
-        run_coroutine_handle_error(bot.start(), event_loop)
+    run_coroutine_handle_error(bot.start(), event_loop)
 
-        app = aiohttp.web.Application()
-        app.router.add_post('', general_announce)
+    app = aiohttp.web.Application()
+    app.router.add_post('', general_announce)
 
-        run_coroutine_handle_error(
-            event_loop.create_server(
-                app.make_handler(), host="localhost", port=40862))
+    run_coroutine_handle_error(
+        event_loop.create_server(
+            app.make_handler(), host="localhost", port=40862))
 
-        event_loop.run_forever()
-
-        print("event loop finished.")
-
-    except Exception as e:
-        print(e)
-        raise e
-
-    finally:
-        event_loop.run_until_complete(bot.stop())
-        event_loop.stop()
+    event_loop.run_forever()
 
 
 if __name__ == '__main__':
