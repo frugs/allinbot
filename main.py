@@ -83,7 +83,7 @@ def main():
 
     run_coroutine_handle_error(
         event_loop.create_server(
-            app.make_handler(), host="localhost", port=40862))
+            app.make_handler(), host="localhost", port=40862), event_loop)
 
     event_loop.run_forever()
 
