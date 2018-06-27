@@ -45,25 +45,31 @@ class LeagueMentionHandler(Handler):
             QueryLeaguePlayerDiscordIdsDatabaseTask(self._league_id,
                                                     self._db_config))
 
-        def online_and_idle(discord_id: str) -> bool:
+        def mention_if_online_and_idle(discord_id: str) -> str:
             discord_member = message.server.get_member(discord_id)
-            return discord_member and discord_member.status in [
+            if not discord_member:
+                return ""
+
+            if discord_member.status in [
                 discord.Status.online, discord.Status.idle
-            ]
+            ]:
+                return "<@{}>".format(discord_id)
+            else:
+                nick = discord_member.nick
+                return nick if nick else discord_member.name
 
-        online_and_idle_ids = list(filter(online_and_idle, ids))
+        mentions_and_names = list(
+            filter(lambda x: x, map(mention_if_online_and_idle, ids)))
 
-        if online_and_idle_ids:
-            mentions = ", ".join([
-                "<@{}>".format(discord_id)
-                for discord_id in online_and_idle_ids
-            ])
+        if mentions_and_names:
+            mentions_and_names_str = ", ".join(mentions_and_names)
 
             match = re.match(self._matcher, message.content)
             message_content = match.group(1) if match else ""
 
-            await client.send_message(message.channel,
-                                      message_content + "\n" + mentions)
+            await client.send_message(
+                message.channel,
+                message_content + "\n" + mentions_and_names_str)
         else:
             await client.send_message(
                 message.channel,
