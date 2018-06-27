@@ -25,9 +25,8 @@ class QueryLeaguePlayerDiscordIdsDatabaseTask(DatabaseTask[typing.List[str]]):
             return []
         else:
             return [
-                member["discord_id"] for member in query_result.val().values()
-                if 'discord_id' in member
-                and member.get("is_full_member", False)
+                member.key() for member in query_result.each()
+                if member.val().get("is_full_member", False)
             ]
 
 
