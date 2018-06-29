@@ -5,8 +5,7 @@ from datetime import datetime
 from .handler import Handler
 
 LETTERS_ONLY = r"^\w+$"
-PATTERN_TEMPLATE = "(?P<pre>\d\s*)(?P<ampm>AM|PM)?(?P<tz>\s*{})(?P<post>$|\s)"
-REPL_TEMPLATE = "\g<pre>\g<ampm>\g<tz> (UTC{:+.1f}) "
+PATTERN_TEMPLATE = "(\d\s*(?:AM|PM)?\s*{}(?:$|[^\w])|^{}$)"
 
 
 class AppendUtcOffsetHandler(Handler):
@@ -25,7 +24,8 @@ class AppendUtcOffsetHandler(Handler):
                 continue
 
             pattern = re.compile(
-                PATTERN_TEMPLATE.format(tz_abbrev), flags=re.IGNORECASE)
+                PATTERN_TEMPLATE.format(tz_abbrev, tz_abbrev),
+                flags=re.IGNORECASE)
             self.timezone_patterns[pattern] = tz
 
     def can_handle_message(self, message: discord.Message) -> bool:
@@ -33,18 +33,17 @@ class AppendUtcOffsetHandler(Handler):
 
     async def handle_message(self, client: discord.Client,
                              message: discord.Message):
-        result = message.content
-        total_subs = 0
+        result = []
         now = datetime.now()
         for pattern, tz in self.timezone_patterns.items():
-            result, subs = pattern.subn(
-                REPL_TEMPLATE.format(
-                    tz.utcoffset(now).total_seconds() / 3600),
-                result)
-            total_subs += subs
+            match = pattern.search(message.content)
+            if match:
+                result.append("{} is UTC{:+.1f}".format(
+                    tz.tzname(now),
+                    tz.utcoffset(now).total_seconds() / 3600))
 
-        if total_subs > 0:
-            await client.send_message(message.channel, result)
+        if result:
+            await client.send_message(message.channel, "\n".join(result))
 
     async def description(self, client) -> str:
         return ""
