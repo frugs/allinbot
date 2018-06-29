@@ -17,7 +17,11 @@ class AppendUtcOffsetHandler(Handler):
         for tz_name in pytz.common_timezones:
             tz = pytz.timezone(tz_name)
             tz_abbrev = tz.tzname(datetime.now())
-            if not re.match(LETTERS_ONLY, tz_abbrev, flags=re.IGNORECASE):
+            if not re.match(
+                    LETTERS_ONLY, tz_abbrev,
+                    flags=re.IGNORECASE) or tz_abbrev in [
+                        'EAT', 'CAT', 'WEST'
+                    ]:
                 continue
 
             pattern = re.compile(
@@ -31,10 +35,11 @@ class AppendUtcOffsetHandler(Handler):
                              message: discord.Message):
         result = message.content
         total_subs = 0
+        now = datetime.now()
         for pattern, tz in self.timezone_patterns.items():
             result, subs = pattern.subn(
                 REPL_TEMPLATE.format(
-                    tz.utcoffset(datetime.now()).total_seconds() / 3600),
+                    tz.utcoffset(now).total_seconds() / 3600),
                 result)
             total_subs += subs
 
