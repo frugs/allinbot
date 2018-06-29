@@ -30,13 +30,16 @@ class AppendUtcOffsetHandler(Handler):
     async def handle_message(self, client: discord.Client,
                              message: discord.Message):
         result = message.content
+        total_subs = 0
         for pattern, tz in self.timezone_patterns.items():
-            result = pattern.sub(
+            result, subs = pattern.subn(
                 REPL_TEMPLATE.format(
                     tz.utcoffset(datetime.now()).total_seconds() / 3600),
                 result)
+            total_subs += subs
 
-        await client.send_message(message.channel, result)
+        if total_subs > 0:
+            await client.send_message(message.channel, result)
 
     async def description(self, client) -> str:
         return ""
