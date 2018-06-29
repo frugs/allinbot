@@ -63,6 +63,8 @@ def main():
 
     bot.register_handler(allinbot.WinStreakHandler(db_config))
 
+    bot.register_handler(allinbot.AppendUtcOffsetHandler())
+
     async def general_announce(
             request: aiohttp.web.Request) -> aiohttp.web.Response:
         data = await request.json()

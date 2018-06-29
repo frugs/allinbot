@@ -21,6 +21,9 @@ class Bot:
 
         @client.event
         async def on_message(message: discord.Message):
+            if message.author.bot:
+                return
+
             if message.content == "!help":
                 print(message.channel.id)
                 await Bot._describe_handlers(self.client, message,

@@ -14,4 +14,5 @@ from allinbot.dynamicpingponghandler import DynamicPingPongHandler
 from allinbot.generalannouncementtask import GeneralAnnouncementTask
 from allinbot.istwitchstreamlivehandler import IsTwitchStreamLiveHandler
 from allinbot.winstreakhandler import WinStreakHandler
+from allinbot.appendutcoffsethandler import AppendUtcOffsetHandler
 import allinbot.database
