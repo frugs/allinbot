@@ -25,11 +25,6 @@ def open_db_connection(config) -> pyrebase.pyrebase.Database:
     return pyrebase.initialize_app(config).database()
 
 
-def load_db_config(path) -> dict:
-    with open(path, "rb") as file:
-        return pickle.load(file)
-
-
 async def perform_database_task(event_loop: asyncio.AbstractEventLoop,
                                 task: DatabaseTask[T]) -> T:
     return await task.perform_task(event_loop)
