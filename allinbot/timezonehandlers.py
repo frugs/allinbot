@@ -10,7 +10,7 @@ class TimeZoneConversionHandler(Handler):
         self.matcher = r'^!timezone\s+(.+)\sto\s([^\s]+)$'
 
     def can_handle_message(self, message: discord.Message) -> bool:
-        return re.match(self.matcher, message.content)
+        return bool(re.match(self.matcher, message.content))
 
     async def handle_message(self, client: discord.Client,
                              message: discord.Message):

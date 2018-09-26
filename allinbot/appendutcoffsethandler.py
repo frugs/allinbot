@@ -29,7 +29,7 @@ class AppendUtcOffsetHandler(Handler):
             self.timezone_patterns[pattern] = tz
 
     def can_handle_message(self, message: discord.Message) -> bool:
-        return re.match(self.command_matcher, message.content)
+        return bool(re.match(self.command_matcher, message.content))
 
     async def handle_message(self, client: discord.Client,
                              message: discord.Message):

@@ -22,12 +22,12 @@ def extract_win_streaks_for_characters(characters: dict):
 
     characters = list(characters)
 
-    def map_characters_to_win_streaks(character: dict) -> Tuple[int, int]:
+    def map_characters_to_win_streaks(character: dict) -> Tuple[int, int, int]:
         ladder_info = character.get("ladder_info", {})
         sorted_seasons = list(sorted(ladder_info.keys(), reverse=True))
         if sorted_seasons:
             latest_season_ladder_info = ladder_info[sorted_seasons[0]]
-            latest_season = int(sorted_seasons[0])
+            character_latest_season = int(sorted_seasons[0])
 
             race_win_streaks = (x.get("current_win_streak", 0)
                                 for x in latest_season_ladder_info.values()
@@ -38,7 +38,7 @@ def extract_win_streaks_for_characters(characters: dict):
                 "longest_win_streak",
                 0) for x in latest_season_ladder_info.values())
 
-            return latest_season, max(
+            return character_latest_season, max(
                 race_win_streaks, default=0), max(
                     race_longest_win_streaks, default=0)
         else:
