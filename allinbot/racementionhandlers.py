@@ -1,6 +1,6 @@
-import os
-import typing
 import re
+import typing
+
 import discord
 import pyrebase
 
