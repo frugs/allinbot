@@ -93,7 +93,7 @@ class Sc2LadderInfoHandler(Handler):
 
             message_to_send += "\nFurther information at: https://apps.all-inspiration.com/ladderinfo/" + discord_id
 
-        await client.send_message(message.channel, message_to_send)
+        await message.channel.send(message_to_send)
 
     async def description(self, client) -> str:
         return _TRIGGER + " {@mention} - retrieves registered user's sc2 ladder info"

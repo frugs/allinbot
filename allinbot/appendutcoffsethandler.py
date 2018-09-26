@@ -43,7 +43,7 @@ class AppendUtcOffsetHandler(Handler):
                     tz.utcoffset(now).total_seconds() / 3600))
 
         if result:
-            await client.send_message(message.channel, "\n".join(result))
+            await message.channel.send("\n".join(result))
 
     async def description(self, client) -> str:
         return ""

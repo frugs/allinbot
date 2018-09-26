@@ -1,12 +1,18 @@
+import asyncio
 import json
 import os
-import asyncio
-import aiohttp
-import aiohttp.web
-import discord
-import allinbot
-import traceback
 import sys
+import traceback
+
+import discord
+from google.cloud import datastore
+
+import allinbot
+
+
+def retrieve_config_value(key: str) -> str:
+    datastore_client = datastore.Client()
+    return datastore_client.get(datastore_client.key("Config", key))["value"]
 
 
 def run_coroutine_handle_error(coro, event_loop):
@@ -21,9 +27,9 @@ def run_coroutine_handle_error(coro, event_loop):
 
 
 def main():
-    token = os.environ.get('BOT_TOKEN')
-    firebase_config = json.loads(os.getenv('FIREBASE_CONFIG', '{}'))
-    twitch_client_id = os.getenv('TWITCH_CLIENT_ID')
+    token = os.environ.get("BOT_TOKEN", retrieve_config_value("discordBotToken"))
+    firebase_config = json.loads(retrieve_config_value("firebaseConfig"))
+    twitch_client_id = retrieve_config_value("twitchClientId")
 
     if not token:
         raise Exception("Could not resolve bot token")
@@ -55,8 +61,6 @@ def main():
 
     bot.register_handler(allinbot.Sc2LadderInfoHandler(db_config))
 
-    bot.register_handler(allinbot.QueenInjectEfficiencyHandler())
-
     bot.register_handler(allinbot.DynamicPingPongHandler(db_config))
 
     bot.register_handler(
@@ -66,29 +70,7 @@ def main():
 
     bot.register_handler(allinbot.AppendUtcOffsetHandler())
 
-    async def general_announce(
-            request: aiohttp.web.Request) -> aiohttp.web.Response:
-        data = await request.json()
-
-        channel_id = data.get("channel_id", "")
-        message = data.get("message", "")
-
-        if channel_id and message:
-            bot.schedule_task(
-                allinbot.GeneralAnnouncementTask(channel_id, message))
-
-        return aiohttp.web.HTTPOk()
-
-    run_coroutine_handle_error(bot.start(), event_loop)
-
-    app = aiohttp.web.Application()
-    app.router.add_post('', general_announce)
-
-    run_coroutine_handle_error(
-        event_loop.create_server(
-            app.make_handler(), host="localhost", port=40862), event_loop)
-
-    event_loop.run_forever()
+    bot.run()
 
 
 if __name__ == '__main__':

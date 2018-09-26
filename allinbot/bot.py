@@ -32,6 +32,9 @@ class Bot:
                 await Bot._dispatch_message_to_handlers(
                     self.client, message, self.handlers)
 
+    def run(self):
+        self.client.run(self.token, reconnect=True)
+
     async def start(self):
         await self.client.start(self.token)
 
@@ -57,7 +60,7 @@ class Bot:
         for handler in handlers:
             descriptions.append(await handler.description(client))
         combined_description = "\n".join(descriptions)
-        await client.send_message(message.channel, combined_description)
+        await message.channel.send(combined_description)
 
     @staticmethod
     async def _dispatch_message_to_handlers(client: discord.Client,

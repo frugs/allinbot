@@ -66,12 +66,10 @@ class TimeZoneConversionHandler(Handler):
                     replies.append("_{} {}_\n{} **{}**".format(
                         from_time_str, from_zone, to_time_str, to_zone))
 
-            await client.send_message(message.channel,
-                                      "\n------\n".join(replies))
+            await message.channel.send("\n------\n".join(replies))
 
         except ValueError as e:
-            await client.send_message(
-                message.channel,
+            await message.channel.send(
                 str(e) +
                 "\nUsage: !timezone {time} {from_timezone} to {to_timezone}")
 

@@ -41,7 +41,7 @@ class RaceMentionHandler(Handler):
             QueryRacePlayerDiscordIdsDatabaseTask(self._race, self._db_config))
 
         def mention_if_online_and_idle(discord_id: str) -> str:
-            discord_member = message.server.get_member(discord_id)
+            discord_member = message.guild.get_member(int(discord_id))
             if not discord_member:
                 return ""
 
@@ -56,18 +56,19 @@ class RaceMentionHandler(Handler):
         mentions_and_names = list(
             filter(lambda x: x, map(mention_if_online_and_idle, ids)))
 
-        mentions_and_names_str = ", ".join(mentions_and_names)
+        if mentions_and_names:
+            mentions_and_names_str = ", ".join(mentions_and_names)
 
-        match = re.match(self._matcher, message.content)
-        message_content = match.group(1) if match else ""
+            match = re.match(self._matcher, message.content)
+            message_content = match.group(1) if match else ""
 
-        await client.send_message(
-            message.channel, message_content + "\n" + mentions_and_names_str)
+            await message.channel.send(
+                message_content + "\n" + mentions_and_names_str)
 
     def can_handle_message(self, message: discord.Message) -> bool:
-        return message.server and (message.content.casefold() == "@{}".format(
+        return message.guild and (message.content.casefold() == "@{}".format(
             self._race.lower()).casefold()
-                                   or re.match(self._matcher, message.content))
+                                  or re.match(self._matcher, message.content))
 
     async def description(self, client) -> str:
         return ("@{} *{{message}}* -"

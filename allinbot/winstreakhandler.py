@@ -117,12 +117,12 @@ class WinStreakHandler(Handler):
         win_streaks.sort(key=lambda x: x[1], reverse=True)
         win_streaks = win_streaks[:5]
 
-        def get_name(discord_id: str) -> str:
-            member = message.server.get_member(discord_id)
+        def get_name(discord_id: int) -> str:
+            member = message.guild.get_member(discord_id)
             if member:
                 return member.nick if member.nick else member.name
             else:
-                return discord_id
+                return str(discord_id)
 
         message_lines = []
         if win_streaks:
@@ -151,7 +151,7 @@ class WinStreakHandler(Handler):
             ]
 
         if message_lines:
-            await client.send_message(message.channel,
+            await message.channel.send(
                                       "\n".join(message_lines))
 
         self.rate_limited = False

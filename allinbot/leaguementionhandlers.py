@@ -45,7 +45,7 @@ class LeagueMentionHandler(Handler):
                                                     self._db_config))
 
         def mention_if_online_and_idle(discord_id: str) -> str:
-            discord_member = message.server.get_member(discord_id)
+            discord_member = message.guild.get_member(int(discord_id))
             if not discord_member:
                 return ""
 
@@ -66,16 +66,14 @@ class LeagueMentionHandler(Handler):
             match = re.match(self._matcher, message.content)
             message_content = match.group(1) if match else ""
 
-            await client.send_message(
-                message.channel,
+            await message.channel.send(
                 message_content + "\n" + mentions_and_names_str)
         else:
-            await client.send_message(
-                message.channel,
+            await message.channel.send(
                 "I'm afraid no one in that league is currently available.")
 
     def can_handle_message(self, message: discord.Message) -> bool:
-        return re.match(self._matcher, message.content)
+        return bool(re.match(self._matcher, message.content))
 
     async def description(self, client) -> str:
         league_name = LEAGUE_NAMES[self._league_id]

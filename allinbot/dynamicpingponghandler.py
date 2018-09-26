@@ -48,7 +48,7 @@ class DynamicPingPongHandler(Handler):
             client.loop, trigger)
 
         if response:
-            await client.send_message(message.channel, response)
+            await message.channel.send(response)
 
     async def description(self, client: discord.Client) -> str:
         return await self._retrieve_help_texts(client.loop)

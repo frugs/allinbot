@@ -22,7 +22,7 @@ class PingPongHandler(Handler):
 
     async def handle_message(self, client: discord.Client,
                              message: discord.Message):
-        await client.send_message(message.channel, self.pong)
+        await message.channel.send(self.pong)
 
     async def description(self, client):
         return self.desc

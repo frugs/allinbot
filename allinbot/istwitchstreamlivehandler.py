@@ -44,31 +44,30 @@ class IsTwitchStreamLiveHandler(Handler):
 
         if not twitch_connection.get("id", "") or not twitch_connection.get(
                 "name", ""):
-            await client.send_message(
-                message.channel,
+            await message.channel.send(
                 "<@{}> has no registered Twitch account.".format(discord_id))
             return
 
         url = "https://api.twitch.tv/helix/streams?first=1&user_id={}".format(
             twitch_connection["id"])
-        resp = await aiohttp.request(
-            "GET", url, headers={"Client-ID": self.twitch_client_id})
 
-        if resp.status != 200:
-            await client.send_message(message.channel,
-                                      "Unknown error occurred.")
-            return
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers={"Client-ID": self.twitch_client_id}) as resp:
 
-        data = await resp.json()
+                if resp.status != 200:
+                    await message.channel.send("Unknown error occurred.")
+                    return
+
+                data = await resp.json()
+
         if data.get("data", []) and data["data"][0].get("type", "") == "live":
             is_live_message = \
                 "<@{}> is currently live! Tune in at https://www.twitch.tv/{}".format(
                     discord_id,
                     twitch_connection["name"])
-            await client.send_message(message.channel, is_live_message)
+            await message.channel.send(is_live_message)
         else:
-            await client.send_message(
-                message.channel,
+            await message.channel.send(
                 "<@{}> is not currently live right now.".format(discord_id))
 
     async def description(self, client: discord.Client) -> str:
