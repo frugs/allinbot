@@ -9,4 +9,5 @@ from allinbot.dynamicpingponghandler import DynamicPingPongHandler
 from allinbot.istwitchstreamlivehandler import IsTwitchStreamLiveHandler
 from allinbot.winstreakhandler import WinStreakHandler
 from allinbot.appendutcoffsethandler import AppendUtcOffsetHandler
+from .trialhandler import TrialHandler
 import allinbot.database

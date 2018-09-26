@@ -63,6 +63,8 @@ def main():
 
     bot.register_handler(allinbot.AppendUtcOffsetHandler())
 
+    bot.register_handler(allinbot.TrialHandler())
+
     bot.run()
 
 
