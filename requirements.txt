@@ -7,4 +7,3 @@ git+https://github.com/Rapptz/discord.py@rewrite#egg=discord.py
 techlabreactor
 sc2reader
 aiohttp>=3.4.4
-google-cloud-datastore

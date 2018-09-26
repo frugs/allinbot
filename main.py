@@ -5,14 +5,7 @@ import sys
 import traceback
 
 import discord
-from google.cloud import datastore
-
 import allinbot
-
-
-def retrieve_config_value(key: str) -> str:
-    datastore_client = datastore.Client()
-    return datastore_client.get(datastore_client.key("Config", key))["value"]
 
 
 def run_coroutine_handle_error(coro, event_loop):
@@ -27,9 +20,9 @@ def run_coroutine_handle_error(coro, event_loop):
 
 
 def main():
-    token = os.environ.get("BOT_TOKEN", retrieve_config_value("discordBotToken"))
-    firebase_config = json.loads(retrieve_config_value("firebaseConfig"))
-    twitch_client_id = retrieve_config_value("twitchClientId")
+    token = os.getenv("BOT_TOKEN", "")
+    firebase_config = json.loads(os.getenv("FIREBASE_CONFIG", {}))
+    twitch_client_id = os.getenv("TWITCH_CLIENT_ID", "")
 
     if not token:
         raise Exception("Could not resolve bot token")
