@@ -1,5 +1,4 @@
 from allinbot.bot import Bot
-from allinbot.task import Task
 from allinbot.simplehandlers import PingPongHandler
 from allinbot.randomhandlers import PingRandomPongHandler
 from allinbot.timezonehandlers import TimeZoneConversionHandler

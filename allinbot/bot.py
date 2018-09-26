@@ -1,8 +1,6 @@
 import discord
-import asyncio
 from typing import Iterable
 from .handler import Handler
-from .task import Task
 
 
 class Bot:
@@ -47,10 +45,6 @@ class Bot:
 
     def unregister_handler(self, handler: Handler):
         self.handlers.remove(handler)
-
-    def schedule_task(self, task: Task):
-        asyncio.ensure_future(
-            task.perform_task(self.client), loop=self.event_loop)
 
     @staticmethod
     async def _describe_handlers(client: discord.Client,
