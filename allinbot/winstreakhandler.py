@@ -97,8 +97,8 @@ class WinStreakHandler(Handler):
         members = await perform_database_task(client.loop,
                                               FetchAllinMembersDatabaseTask(
                                                   self.db_config))
-        member_characters = [(member_id, member_data.get("characters", {}))
-                             for member_id, member_data in members.items()]
+        member_characters = [(int(member_id), member_data.get(
+            "characters", {})) for member_id, member_data in members.items()]
 
         allin_win_streaks = [
             tuple([member_id]) + extract_win_streaks_for_characters(characters)
@@ -151,8 +151,7 @@ class WinStreakHandler(Handler):
             ]
 
         if message_lines:
-            await message.channel.send(
-                                      "\n".join(message_lines))
+            await message.channel.send("\n".join(message_lines))
 
         self.rate_limited = False
 
