@@ -4,9 +4,8 @@ import time
 from typing import List, Tuple
 
 import discord
-import pyrebase
 
-from allinbot.database import DatabaseTask, perform_database_task
+from allinbot.database import DatabaseTask, QueryBuilder, perform_database_task
 from allinbot.handler import Handler
 
 ALLIN_MEMBER_ROLE_ID = os.getenv("ALLIN_MEMBER_ROLE_ID", "")
@@ -64,21 +63,13 @@ def extract_win_streaks_for_characters(characters: dict):
     return 0, 0, 0
 
 
-class FetchMemberIdsDatabaseTask(DatabaseTask[List[str]]):
-    def execute_with_database(self, db: pyrebase.pyrebase.Database) -> List[str]:
-        members = db.child("members").get().val()
-        return members if members else []
-
-
 class FetchAllinMembersDatabaseTask(DatabaseTask[dict]):
-    def execute_with_database(self, db: pyrebase.pyrebase.Database) -> dict:
-        members = db.child("members").order_by_child("is_full_member").equal_to(True).get().val()
-        return members if members else {}
+    def execute_with_database(self, db: QueryBuilder) -> dict:
+        return db.child("members").order_by_child("is_full_member").equal_to(True).get()
 
 
 class WinStreakHandler(Handler):
-    def __init__(self, db_config: dict):
-        self.db_config = db_config
+    def __init__(self):
         self.rate_limited = False
 
     def can_handle_message(self, message: discord.Message) -> bool:
@@ -87,9 +78,7 @@ class WinStreakHandler(Handler):
     async def handle_message(self, client: discord.Client, message: discord.Message):
         self.rate_limited = True
 
-        members = await perform_database_task(
-            client.loop, FetchAllinMembersDatabaseTask(self.db_config)
-        )
+        members = await perform_database_task(client.loop, FetchAllinMembersDatabaseTask())
         member_characters = [
             (int(member_id), member_data.get("characters", {}))
             for member_id, member_data in members.items()

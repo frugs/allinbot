@@ -58,7 +58,7 @@ def main():
 
     bot.register_handler(allinbot.IsTwitchStreamLiveHandler(twitch_client_id))
 
-    bot.register_handler(allinbot.WinStreakHandler(db_config))
+    bot.register_handler(allinbot.WinStreakHandler())
 
     bot.register_handler(allinbot.AppendUtcOffsetHandler())
 
