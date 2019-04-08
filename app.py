@@ -56,7 +56,7 @@ def main():
 
     bot.register_handler(allinbot.DynamicPingPongHandler(db_config))
 
-    bot.register_handler(allinbot.IsTwitchStreamLiveHandler(db_config, twitch_client_id))
+    bot.register_handler(allinbot.IsTwitchStreamLiveHandler(twitch_client_id))
 
     bot.register_handler(allinbot.WinStreakHandler(db_config))
 
