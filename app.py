@@ -54,7 +54,7 @@ def main():
 
     bot.register_handler(allinbot.Sc2LadderInfoHandler())
 
-    bot.register_handler(allinbot.DynamicPingPongHandler(db_config))
+    bot.register_handler(allinbot.DynamicPingPongHandler())
 
     bot.register_handler(allinbot.IsTwitchStreamLiveHandler(twitch_client_id))
 
