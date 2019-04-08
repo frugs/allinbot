@@ -3,13 +3,12 @@ import re
 import typing
 
 import discord
-import pyrebase
 
-from .database import DatabaseTask, perform_database_task
+from .database import DatabaseTask, QueryBuilder, perform_database_task
 from .handler import Handler
 
 _TRIGGER = "!ladderinfo"
-_PATTERN = re.compile("^" + _TRIGGER + "\s+<@[!]*(\d*)>$")
+_PATTERN = re.compile("^" + _TRIGGER + "\\s+<@[!]*(\\d*)>$")
 _RACES = ["Zerg", "Terran", "Protoss", "Random"]
 _LEAGUE_EMBLEMS = [
     "<:bronze:230151914812211210>", "<:silver:230151947498291211>", "<:gold:230151929236291585>",
@@ -19,29 +18,21 @@ _LEAGUE_EMBLEMS = [
 
 
 class RetrieveLadderInfoDatabaseTask(DatabaseTask[dict]):
-    def __init__(self, discord_id: str, db_config: dict):
-        super().__init__(db_config)
+    def __init__(self, discord_id: str):
+        super().__init__()
         self._discord_id = discord_id
 
-    def execute_with_database(self, db: pyrebase.pyrebase.Database) -> dict:
-        query_result = db.child("members").child(self._discord_id).get()
-
-        if not query_result.pyres:
-            return {}
-
-        return query_result.val()
+    def execute_with_database(self, db: QueryBuilder) -> dict:
+        return db.child("members").child(self._discord_id).get()
 
 
 class Sc2LadderInfoHandler(Handler):
-    def __init__(self, db_config: dict):
-        self._db_config = db_config
-
     async def handle_message(self, client: discord.Client, message: discord.Message):
         match = _PATTERN.match(message.content)
         discord_id = match.groups(1)[0]
 
         ladder_info = await perform_database_task(
-            client.loop, RetrieveLadderInfoDatabaseTask(discord_id, self._db_config)
+            client.loop, RetrieveLadderInfoDatabaseTask(discord_id)
         )
 
         if not ladder_info:

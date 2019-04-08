@@ -52,7 +52,7 @@ def main():
     for handler in allinbot.league_mention_handlers():
         bot.register_handler(handler)
 
-    bot.register_handler(allinbot.Sc2LadderInfoHandler(db_config))
+    bot.register_handler(allinbot.Sc2LadderInfoHandler())
 
     bot.register_handler(allinbot.DynamicPingPongHandler(db_config))
 
