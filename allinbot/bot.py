@@ -24,11 +24,9 @@ class Bot:
 
             if message.content == "!help":
                 print(message.channel.id)
-                await Bot._describe_handlers(self.client, message,
-                                             self.handlers)
+                await Bot._describe_handlers(self.client, message, self.handlers)
             else:
-                await Bot._dispatch_message_to_handlers(
-                    self.client, message, self.handlers)
+                await Bot._dispatch_message_to_handlers(self.client, message, self.handlers)
 
     def run(self):
         self.client.run(self.token, reconnect=True)
@@ -47,9 +45,9 @@ class Bot:
         self.handlers.remove(handler)
 
     @staticmethod
-    async def _describe_handlers(client: discord.Client,
-                                 message: discord.Message,
-                                 handlers: Iterable[Handler]):
+    async def _describe_handlers(
+        client: discord.Client, message: discord.Message, handlers: Iterable[Handler]
+    ):
         descriptions = []
         for handler in handlers:
             descriptions.append(await handler.description(client))
@@ -57,9 +55,9 @@ class Bot:
         await message.channel.send(combined_description)
 
     @staticmethod
-    async def _dispatch_message_to_handlers(client: discord.Client,
-                                            message: discord.Message,
-                                            handlers: Iterable[Handler]):
+    async def _dispatch_message_to_handlers(
+        client: discord.Client, message: discord.Message, handlers: Iterable[Handler]
+    ):
         for handler in handlers:
             if handler.can_handle_message(message):
                 await handler.handle_message(client, message)

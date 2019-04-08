@@ -37,8 +37,8 @@ def main():
 
     lobster_handler = allinbot.PingRandomPongHandler(
         "!bringoutthedancinglobsters",
-        [(0.1, "http://i.imgur.com/BMcur.gif"),
-         (0.9, "Sorry, they are all asleep right now.")])
+        [(0.1, "http://i.imgur.com/BMcur.gif"), (0.9, "Sorry, they are all asleep right now.")]
+    )
     bot.register_handler(lobster_handler)
 
     bot.register_handler(allinbot.TimeZoneConversionHandler())
@@ -56,8 +56,7 @@ def main():
 
     bot.register_handler(allinbot.DynamicPingPongHandler(db_config))
 
-    bot.register_handler(
-        allinbot.IsTwitchStreamLiveHandler(db_config, twitch_client_id))
+    bot.register_handler(allinbot.IsTwitchStreamLiveHandler(db_config, twitch_client_id))
 
     bot.register_handler(allinbot.WinStreakHandler(db_config))
 

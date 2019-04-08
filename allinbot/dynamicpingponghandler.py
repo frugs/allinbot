@@ -13,8 +13,7 @@ class RetrieveResponseForTriggerTask(DatabaseTask[str]):
         self.trigger = trigger
 
     def execute_with_database(self, db: pyrebase.pyrebase.Database) -> str:
-        trigger_response_data = db.child("triggers").child(
-            self.trigger).get().val()
+        trigger_response_data = db.child("triggers").child(self.trigger).get().val()
         if trigger_response_data:
             return trigger_response_data.get("response", "")
 
@@ -41,11 +40,9 @@ class DynamicPingPongHandler(Handler):
         text = message.content
         return len(text) > 1 and text.startswith("!") and ' ' not in text
 
-    async def handle_message(self, client: discord.Client,
-                             message: discord.Message):
+    async def handle_message(self, client: discord.Client, message: discord.Message):
         trigger = message.content[1:]
-        response = await self._retrieve_response_for_trigger(
-            client.loop, trigger)
+        response = await self._retrieve_response_for_trigger(client.loop, trigger)
 
         if response:
             await message.channel.send(response)
@@ -54,7 +51,8 @@ class DynamicPingPongHandler(Handler):
         return await self._retrieve_help_texts(client.loop)
 
     async def _retrieve_response_for_trigger(
-            self, event_loop: AbstractEventLoop, trigger: str) -> str:
+        self, event_loop: AbstractEventLoop, trigger: str
+    ) -> str:
         task = RetrieveResponseForTriggerTask(self.db_config, trigger)
         return await perform_database_task(event_loop, task)
 

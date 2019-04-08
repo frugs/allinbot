@@ -13,7 +13,9 @@ FIREBASE_CONFIG = json.loads(os.getenv("FIREBASE_CONFIG", {}))
 
 firebase_admin.initialize_app(
     credential=firebase_admin.credentials.Certificate(FIREBASE_CONFIG.get("serviceAccount", {})),
-    options=FIREBASE_CONFIG)
+    options=FIREBASE_CONFIG
+)
+
 
 class QueryBuilder:
     def __init__(self):
@@ -34,7 +36,7 @@ class QueryBuilder:
         clone = self._clone()
         clone._path.append(path)
         return clone
-        
+
     def order_by_child(self, path: str) -> "QueryBuilder":
         clone = self._clone()
         clone._order_by_child_path = path
@@ -44,7 +46,7 @@ class QueryBuilder:
         clone = self._clone()
         clone._equal_to_val = value
         return clone
-    
+
     def set_shallow(self, value: bool) -> "QueryBuilder":
         clone = self._clone()
         clone._is_shallow_query = bool(value)
@@ -52,10 +54,10 @@ class QueryBuilder:
 
     def get(self) -> dict:
         ref = firebase_admin.db.reference()
-        
+
         for child in self._path:
             ref = ref.child(child)
-        
+
         if self._order_by_child_path:
             query = ref.order_by_child(self._order_by_child_path)
 
@@ -63,7 +65,7 @@ class QueryBuilder:
                 query.equal_to(self._equal_to_val)
         else:
             query = None
-        
+
         if query:
             return query.get()
         else:
@@ -81,6 +83,5 @@ class DatabaseTask(typing.Generic[T]):
         return self.execute_with_database(QueryBuilder())
 
 
-async def perform_database_task(event_loop: asyncio.AbstractEventLoop,
-                                task: DatabaseTask[T]) -> T:
+async def perform_database_task(event_loop: asyncio.AbstractEventLoop, task: DatabaseTask[T]) -> T:
     return await task.perform_task(event_loop)

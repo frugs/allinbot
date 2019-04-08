@@ -20,8 +20,7 @@ class PingPongHandler(Handler):
     def can_handle_message(self, message: discord.Message):
         return message.content == self.ping
 
-    async def handle_message(self, client: discord.Client,
-                             message: discord.Message):
+    async def handle_message(self, client: discord.Client, message: discord.Message):
         await message.channel.send(self.pong)
 
     async def description(self, client):

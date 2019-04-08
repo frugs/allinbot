@@ -18,7 +18,8 @@ class FetchTwitchConnectionDatabaseTask(DatabaseTask[dict]):
 
     def execute_with_database(self, db: pyrebase.pyrebase.Database) -> dict:
         twitch_connection = db.child("members").child(
-            self.member).child("connections").child("twitch").get().val()
+            self.member
+        ).child("connections").child("twitch").get().val()
         if not twitch_connection:
             twitch_connection = {}
 
@@ -33,23 +34,21 @@ class IsTwitchStreamLiveHandler(Handler):
     def can_handle_message(self, message: discord.Message) -> bool:
         return bool(re.match(_PATTERN, message.content))
 
-    async def handle_message(self, client: discord.Client,
-                             message: discord.Message):
+    async def handle_message(self, client: discord.Client, message: discord.Message):
         match = _PATTERN.match(message.content)
         discord_id = match.groups(1)[0]
 
         twitch_connection = await perform_database_task(
-            client.loop,
-            FetchTwitchConnectionDatabaseTask(self.db_config, discord_id))
+            client.loop, FetchTwitchConnectionDatabaseTask(self.db_config, discord_id)
+        )
 
-        if not twitch_connection.get("id", "") or not twitch_connection.get(
-                "name", ""):
-            await message.channel.send(
-                "<@{}> has no registered Twitch account.".format(discord_id))
+        if not twitch_connection.get("id", "") or not twitch_connection.get("name", ""):
+            await message.channel.send("<@{}> has no registered Twitch account.".format(discord_id))
             return
 
         url = "https://api.twitch.tv/helix/streams?first=1&user_id={}".format(
-            twitch_connection["id"])
+            twitch_connection["id"]
+        )
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers={"Client-ID": self.twitch_client_id}) as resp:
@@ -67,8 +66,7 @@ class IsTwitchStreamLiveHandler(Handler):
                     twitch_connection["name"])
             await message.channel.send(is_live_message)
         else:
-            await message.channel.send(
-                "<@{}> is not currently live right now.".format(discord_id))
+            await message.channel.send("<@{}> is not currently live right now.".format(discord_id))
 
     async def description(self, client: discord.Client) -> str:
         return _TRIGGER + " {@mention} - checks if the mentioned member is currently live on Twitch."

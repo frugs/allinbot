@@ -12,8 +12,7 @@ class Handler:
         """
         raise NotImplementedError("handlers must implement this")
 
-    async def handle_message(self, client: discord.Client,
-                             message: discord.Message):
+    async def handle_message(self, client: discord.Client, message: discord.Message):
         """
         Messages for which can_handle_message() returned true will be passed to this handler for the handler to deal
         with as appropriate.
