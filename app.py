@@ -21,14 +21,10 @@ def run_coroutine_handle_error(coro, event_loop):
 
 def main():
     token = os.getenv("BOT_TOKEN", "")
-    firebase_config = json.loads(os.getenv("FIREBASE_CONFIG", {}))
     twitch_client_id = os.getenv("TWITCH_CLIENT_ID", "")
 
     if not token:
         raise Exception("Could not resolve bot token")
-
-    if not firebase_config:
-        raise Exception("Could not resolve firebase config")
 
     event_loop = asyncio.get_event_loop()
 
@@ -43,11 +39,10 @@ def main():
 
     bot.register_handler(allinbot.TimeZoneConversionHandler())
 
-    db_config = firebase_config
-    bot.register_handler(allinbot.zerg_mention_handler(db_config))
-    bot.register_handler(allinbot.protoss_mention_handler(db_config))
-    bot.register_handler(allinbot.terran_mention_handler(db_config))
-    bot.register_handler(allinbot.random_mention_handler(db_config))
+    bot.register_handler(allinbot.zerg_mention_handler())
+    bot.register_handler(allinbot.protoss_mention_handler())
+    bot.register_handler(allinbot.terran_mention_handler())
+    bot.register_handler(allinbot.random_mention_handler())
 
     for handler in allinbot.league_mention_handlers():
         bot.register_handler(handler)

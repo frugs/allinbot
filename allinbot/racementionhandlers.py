@@ -2,39 +2,37 @@ import re
 import typing
 
 import discord
-import pyrebase
 
-from .database import perform_database_task, DatabaseTask
+from .database import perform_database_task, QueryBuilder, DatabaseTask
 from .handler import Handler
 
 
 class QueryRacePlayerDiscordIdsDatabaseTask(DatabaseTask[typing.List[str]]):
-    def __init__(self, race: str, db_config: dict):
-        DatabaseTask.__init__(self, db_config)
+    def __init__(self, race: str):
+        DatabaseTask.__init__(self)
         self._lower_race = race.lower()
 
-    def execute_with_database(self, db: pyrebase.pyrebase.Database) -> typing.List[str]:
+    def execute_with_database(self, db: QueryBuilder) -> typing.List[str]:
         query_result = db.child("members").order_by_child("{}_player".format(self._lower_race)
                                                           ).equal_to(True).get()
 
-        if not query_result.pyres:
+        if not query_result:
             return []
         else:
             return [
-                member.key() for member in query_result.each()
-                if member.val().get("is_full_member", False)
+                member_id for member_id, member in query_result.items()
+                if member.get("is_full_member", False)
             ]
 
 
 class RaceMentionHandler(Handler):
-    def __init__(self, race: str, db_config: dict):
+    def __init__(self, race: str):
         self._race = race
-        self._db_config = db_config
-        self._matcher = re.compile("^@{}(?:\s+)?(.*)$".format(race.lower()), re.IGNORECASE)
+        self._matcher = re.compile("^@{}(?:\\s+)?(.*)$".format(race.lower()), re.IGNORECASE)
 
     async def handle_message(self, client: discord.Client, message: discord.Message):
         ids = await perform_database_task(
-            client.loop, QueryRacePlayerDiscordIdsDatabaseTask(self._race, self._db_config)
+            client.loop, QueryRacePlayerDiscordIdsDatabaseTask(self._race)
         )
 
         def mention_if_online_and_idle(discord_id: str) -> str:
@@ -70,17 +68,17 @@ class RaceMentionHandler(Handler):
                 ).format(self._race.lower(), self._race)
 
 
-def zerg_mention_handler(db_config: dict) -> Handler:
-    return RaceMentionHandler("Zerg", db_config)
+def zerg_mention_handler() -> Handler:
+    return RaceMentionHandler("Zerg")
 
 
-def protoss_mention_handler(db_config: dict) -> Handler:
-    return RaceMentionHandler("Protoss", db_config)
+def protoss_mention_handler() -> Handler:
+    return RaceMentionHandler("Protoss")
 
 
-def terran_mention_handler(db_config: dict) -> Handler:
-    return RaceMentionHandler("Terran", db_config)
+def terran_mention_handler() -> Handler:
+    return RaceMentionHandler("Terran")
 
 
-def random_mention_handler(db_config: dict) -> Handler:
-    return RaceMentionHandler("Random", db_config)
+def random_mention_handler() -> Handler:
+    return RaceMentionHandler("Random")
