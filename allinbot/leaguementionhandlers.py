@@ -1,9 +1,8 @@
 import typing
 import re
 import discord
-import pyrebase
 
-from .database import perform_database_task, DatabaseTask
+from .database import perform_database_task, DatabaseTask, QueryBuilder
 from .handler import Handler
 
 LEAGUE_NAMES = [
@@ -12,37 +11,35 @@ LEAGUE_NAMES = [
 
 
 class QueryLeaguePlayerDiscordIdsDatabaseTask(DatabaseTask[typing.List[str]]):
-    def __init__(self, league_id: int, db_config: dict):
-        DatabaseTask.__init__(self, db_config)
+    def __init__(self, league_id: int):
+        DatabaseTask.__init__()
         self._league_id = league_id
 
-    def execute_with_database(
-            self, db: pyrebase.pyrebase.Database) -> typing.List[str]:
+    def execute_with_database(self, db: QueryBuilder) -> typing.List[str]:
         query_result = db.child("members").order_by_child(
             "current_league").equal_to(self._league_id).get()
 
-        if not query_result.pyres:
+        if not query_result:
             return []
         else:
             return [
-                member.key() for member in query_result.each()
-                if member.val().get("is_full_member", False)
+                member_id for member_id, member in query_result.items()
+                if member.get("is_full_member", False)
             ]
 
 
 class LeagueMentionHandler(Handler):
-    def __init__(self, league_id: int, db_config: dict):
+    def __init__(self, league_id: int):
         self._league_id = league_id
-        self._db_config = db_config
-        self._matcher = re.compile("^@{}(?:\s+)?(.*)$".format(
-            LEAGUE_NAMES[league_id].casefold(), re.IGNORECASE))
+        self._matcher = re.compile(
+            "^@{}(?:\\s+)?(.*)$".format(LEAGUE_NAMES[league_id].casefold()), re.IGNORECASE
+        )
 
     async def handle_message(self, client: discord.Client,
                              message: discord.Message):
         ids = await perform_database_task(
             client.loop,
-            QueryLeaguePlayerDiscordIdsDatabaseTask(self._league_id,
-                                                    self._db_config))
+            QueryLeaguePlayerDiscordIdsDatabaseTask(self._league_id))
 
         def mention_if_online_and_idle(discord_id: str) -> str:
             discord_member = message.guild.get_member(int(discord_id))
@@ -82,7 +79,5 @@ class LeagueMentionHandler(Handler):
                     league_name.casefold(), league_name)
 
 
-def league_mention_handlers(db_config: dict) -> typing.List[Handler]:
-    return [
-        LeagueMentionHandler(i, db_config) for i in range(len(LEAGUE_NAMES))
-    ]
+def league_mention_handlers() -> typing.List[Handler]:
+    return [LeagueMentionHandler(i) for i in range(len(LEAGUE_NAMES))]

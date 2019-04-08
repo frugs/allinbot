@@ -49,7 +49,7 @@ def main():
     bot.register_handler(allinbot.terran_mention_handler(db_config))
     bot.register_handler(allinbot.random_mention_handler(db_config))
 
-    for handler in allinbot.league_mention_handlers(db_config):
+    for handler in allinbot.league_mention_handlers():
         bot.register_handler(handler)
 
     bot.register_handler(allinbot.Sc2LadderInfoHandler(db_config))
