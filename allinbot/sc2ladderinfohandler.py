@@ -75,7 +75,7 @@ class Sc2LadderInfoHandler(Handler):
                     previous_season_games_played
                 )
 
-            message_to_send += "\nFurther information at: https://apps.all-inspiration.com/ladderinfo/" + discord_id
+            message_to_send += "\nFurther information at: https://all-inspiration-apps.appspot.com/ladderinfo/" + discord_id
 
         await message.channel.send(message_to_send)
 
