@@ -51,4 +51,4 @@ class LadderHeroHandler(Handler):
         self.rate_limited = False
 
     async def description(self, client: discord.Client) -> str:
-        return _TRIGGER + " - displays the current top five longest ladder win streaks."
+        return _TRIGGER + " - displays the greatest ladder heroes this season."
