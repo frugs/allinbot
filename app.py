@@ -62,6 +62,8 @@ def main():
 
     bot.register_handler(allinbot.TrialHandler())
 
+    bot.register_handler(allinbot.LadderHeroHandler())
+
     bot.run()
 
 

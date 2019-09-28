@@ -15,4 +15,5 @@ from allinbot.istwitchstreamlivehandler import IsTwitchStreamLiveHandler
 from allinbot.winstreakhandler import WinStreakHandler
 from allinbot.appendutcoffsethandler import AppendUtcOffsetHandler
 from .trialhandler import TrialHandler
+from .ladderherohandler import LadderHeroHandler
 import allinbot.database

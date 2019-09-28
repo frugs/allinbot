@@ -5,8 +5,11 @@ from typing import List, Tuple
 
 import discord
 
-from allinbot.database import DatabaseTask, QueryBuilder, perform_database_task
+from allinbot.database import perform_database_task
 from allinbot.handler import Handler
+
+from .fetchmembersdatabasetask import FetchAllinMembersDatabaseTask
+
 
 ALLIN_MEMBER_ROLE_ID = os.getenv("ALLIN_MEMBER_ROLE_ID", "")
 
@@ -71,11 +74,6 @@ def extract_win_streaks_for_characters(characters: dict):
             )
 
     return 0, 0, 0
-
-
-class FetchAllinMembersDatabaseTask(DatabaseTask[dict]):
-    def execute_with_database(self, db: QueryBuilder) -> dict:
-        return db.child("members").order_by_child("is_full_member").equal_to(True).get()
 
 
 class WinStreakHandler(Handler):
