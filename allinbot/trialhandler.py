@@ -38,14 +38,19 @@ def format_datetime(date_time: datetime.datetime) -> str:
 
 class TrialHandler(Handler):
     def can_handle_message(self, message: discord.Message) -> bool:
-        return message.channel.id == ALLIN_RECRUITMENT_CHANNEL_ID and message.content in TRIGGERS
+        return (
+            message.channel.id == ALLIN_RECRUITMENT_CHANNEL_ID
+            and message.content in TRIGGERS
+        )
 
     async def handle_message(self, client: discord.Client, message: discord.Message):
         if not client.is_ready():
             return
 
         trial_role = message.guild.get_role(ALLIN_TRIAL_MEMBER_ROLE_ID)
-        trial_members = [member for member in message.guild.members if trial_role in member.roles]
+        trial_members = [
+            member for member in message.guild.members if trial_role in member.roles
+        ]
 
         if not trial_members:
             return
@@ -57,10 +62,14 @@ class TrialHandler(Handler):
                 member.mention,
                 format_time_delta(datetime.datetime.utcnow() - member.joined_at),
                 format_datetime(member.joined_at),
-            ) for member in trial_members
+            )
+            for member in trial_members
         ]
 
-        lines = ["{} - joined {} ({})".format(*single_line_data) for single_line_data in line_data]
+        lines = [
+            "{} - joined {} ({})".format(*single_line_data)
+            for single_line_data in line_data
+        ]
 
         recruitment_channel = message.guild.get_channel(ALLIN_RECRUITMENT_CHANNEL_ID)
         await recruitment_channel.send("\n".join(lines))

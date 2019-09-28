@@ -16,12 +16,14 @@ class AppendUtcOffsetHandler(Handler):
         for tz_name in pytz.common_timezones:
             tz = pytz.timezone(tz_name)
             tz_abbrev = tz.tzname(datetime.now())
-            if not re.match(LETTERS_ONLY, tz_abbrev, flags=re.IGNORECASE) or tz_abbrev in [
-                'EAT', 'CAT', 'WEST'
-            ]:
+            if not re.match(
+                LETTERS_ONLY, tz_abbrev, flags=re.IGNORECASE
+            ) or tz_abbrev in ["EAT", "CAT", "WEST"]:
                 continue
 
-            pattern = re.compile(PATTERN_TEMPLATE.format(tz_abbrev, tz_abbrev), flags=re.IGNORECASE)
+            pattern = re.compile(
+                PATTERN_TEMPLATE.format(tz_abbrev, tz_abbrev), flags=re.IGNORECASE
+            )
             self.timezone_patterns[pattern] = tz
 
     def can_handle_message(self, message: discord.Message) -> bool:
@@ -35,8 +37,7 @@ class AppendUtcOffsetHandler(Handler):
             if match:
                 result.append(
                     "{} is UTC{:+.1f}".format(
-                        tz.tzname(now),
-                        tz.utcoffset(now).total_seconds() / 3600
+                        tz.tzname(now), tz.utcoffset(now).total_seconds() / 3600
                     )
                 )
 

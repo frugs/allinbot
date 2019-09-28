@@ -7,7 +7,7 @@ from . import timezone
 
 class TimeZoneConversionHandler(Handler):
     def __init__(self):
-        self.matcher = r'^!timezone\s+(.+)\sto\s([^\s]+)$'
+        self.matcher = r"^!timezone\s+(.+)\sto\s([^\s]+)$"
 
     def can_handle_message(self, message: discord.Message) -> bool:
         return bool(re.match(self.matcher, message.content))
@@ -16,14 +16,21 @@ class TimeZoneConversionHandler(Handler):
         try:
 
             match = re.match(self.matcher, message.content)
-            from_time_args = match.group(1).split(' ')
+            from_time_args = match.group(1).split(" ")
             to_timezone = match.group(2).upper()
 
             if len(from_time_args) >= 2:
                 time = " ".join(from_time_args[0:-1])
                 from_tz_str = from_time_args[-1].upper()
 
-                for time_format in ["%H:%M", "%H%M", "%I:%M %p", "%I:%M%p", "%I%p", "%I %p"]:
+                for time_format in [
+                    "%H:%M",
+                    "%H%M",
+                    "%I:%M %p",
+                    "%I:%M%p",
+                    "%I%p",
+                    "%I %p",
+                ]:
                     try:
                         naive_time_only = datetime.strptime(time, time_format)
                         break
@@ -64,7 +71,9 @@ class TimeZoneConversionHandler(Handler):
                     to_zone = to_datetime.tzinfo.zone
 
                     replies.append(
-                        "_{} {}_\n{} **{}**".format(from_time_str, from_zone, to_time_str, to_zone)
+                        "_{} {}_\n{} **{}**".format(
+                            from_time_str, from_zone, to_time_str, to_zone
+                        )
                     )
 
             await message.channel.send("\n------\n".join(replies))

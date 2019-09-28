@@ -7,13 +7,15 @@ import firebase_admin.db
 import os
 import json
 
-T = typing.TypeVar('T')
+T = typing.TypeVar("T")
 
 FIREBASE_CONFIG = json.loads(os.getenv("FIREBASE_CONFIG", {}))
 
 firebase_admin.initialize_app(
-    credential=firebase_admin.credentials.Certificate(FIREBASE_CONFIG.get("serviceAccount", {})),
-    options=FIREBASE_CONFIG
+    credential=firebase_admin.credentials.Certificate(
+        FIREBASE_CONFIG.get("serviceAccount", {})
+    ),
+    options=FIREBASE_CONFIG,
 )
 
 
@@ -83,5 +85,7 @@ class DatabaseTask(typing.Generic[T]):
         return self.execute_with_database(QueryBuilder())
 
 
-async def perform_database_task(event_loop: asyncio.AbstractEventLoop, task: DatabaseTask[T]) -> T:
+async def perform_database_task(
+    event_loop: asyncio.AbstractEventLoop, task: DatabaseTask[T]
+) -> T:
     return await task.perform_task(event_loop)

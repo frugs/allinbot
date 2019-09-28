@@ -11,7 +11,9 @@ class PingRandomPongHandler(Handler):
     Handler which responds to {ping} with a randomly selected message {pong}. Supports weighting.
     """
 
-    def __init__(self, ping: str, pong_choices: Iterable[Tuple[float, str]], desc: str = None):
+    def __init__(
+        self, ping: str, pong_choices: Iterable[Tuple[float, str]], desc: str = None
+    ):
         self.ping = ping
 
         self.cumulative_weights = []

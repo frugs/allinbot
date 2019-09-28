@@ -12,10 +12,10 @@ class Bot:
 
         @client.event
         async def on_ready():
-            print('Logged in as')
+            print("Logged in as")
             print(self.client.user.name)
             print(self.client.user.id)
-            print('------')
+            print("------")
 
         @client.event
         async def on_message(message: discord.Message):
@@ -26,7 +26,9 @@ class Bot:
                 print(message.channel.id)
                 await Bot._describe_handlers(self.client, message, self.handlers)
             else:
-                await Bot._dispatch_message_to_handlers(self.client, message, self.handlers)
+                await Bot._dispatch_message_to_handlers(
+                    self.client, message, self.handlers
+                )
 
     def run(self):
         self.client.run(self.token, reconnect=True)

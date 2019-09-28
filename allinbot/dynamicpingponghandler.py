@@ -13,7 +13,9 @@ class RetrieveResponseForTriggerTask(DatabaseTask[str]):
 
     def execute_with_database(self, db: QueryBuilder) -> str:
         trigger_response_data = db.child("triggers").child(self.trigger).get()
-        return trigger_response_data.get("response", "") if trigger_response_data else ""
+        return (
+            trigger_response_data.get("response", "") if trigger_response_data else ""
+        )
 
 
 class RetrieveTriggerHelpTexts(DatabaseTask[str]):
@@ -32,7 +34,7 @@ class RetrieveTriggerHelpTexts(DatabaseTask[str]):
 class DynamicPingPongHandler(Handler):
     def can_handle_message(self, message: discord.Message) -> bool:
         text = message.content
-        return len(text) > 1 and text.startswith("!") and ' ' not in text
+        return len(text) > 1 and text.startswith("!") and " " not in text
 
     async def handle_message(self, client: discord.Client, message: discord.Message):
         trigger = message.content[1:]

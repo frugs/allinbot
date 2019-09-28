@@ -13,14 +13,19 @@ class QueryRacePlayerDiscordIdsDatabaseTask(DatabaseTask[typing.List[str]]):
         self._lower_race = race.lower()
 
     def execute_with_database(self, db: QueryBuilder) -> typing.List[str]:
-        query_result = db.child("members").order_by_child("{}_player".format(self._lower_race)
-                                                          ).equal_to(True).get()
+        query_result = (
+            db.child("members")
+            .order_by_child("{}_player".format(self._lower_race))
+            .equal_to(True)
+            .get()
+        )
 
         if not query_result:
             return []
         else:
             return [
-                member_id for member_id, member in query_result.items()
+                member_id
+                for member_id, member in query_result.items()
                 if member.get("is_full_member", False)
             ]
 
@@ -28,7 +33,9 @@ class QueryRacePlayerDiscordIdsDatabaseTask(DatabaseTask[typing.List[str]]):
 class RaceMentionHandler(Handler):
     def __init__(self, race: str):
         self._race = race
-        self._matcher = re.compile("^@{}(?:\\s+)?(.*)$".format(race.lower()), re.IGNORECASE)
+        self._matcher = re.compile(
+            "^@{}(?:\\s+)?(.*)$".format(race.lower()), re.IGNORECASE
+        )
 
     async def handle_message(self, client: discord.Client, message: discord.Message):
         ids = await perform_database_task(
@@ -46,7 +53,9 @@ class RaceMentionHandler(Handler):
                 nick = discord_member.nick
                 return nick if nick else discord_member.name
 
-        mentions_and_names = list(filter(lambda x: x, map(mention_if_online_and_idle, ids)))
+        mentions_and_names = list(
+            filter(lambda x: x, map(mention_if_online_and_idle, ids))
+        )
 
         if mentions_and_names:
             mentions_and_names_str = ", ".join(mentions_and_names)
@@ -63,9 +72,9 @@ class RaceMentionHandler(Handler):
         )
 
     async def description(self, client) -> str:
-        return ("@{} *{{message}}* -"
-                "@mention members who play {} with {{message}}"
-                ).format(self._race.lower(), self._race)
+        return (
+            "@{} *{{message}}* -" "@mention members who play {} with {{message}}"
+        ).format(self._race.lower(), self._race)
 
 
 def zerg_mention_handler() -> Handler:

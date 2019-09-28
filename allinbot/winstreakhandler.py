@@ -28,20 +28,27 @@ def extract_win_streaks_for_characters(characters: dict):
             character_latest_season = int(sorted_seasons[0])
 
             race_win_streaks = (
-                x.get("current_win_streak", 0) for x in latest_season_ladder_info.values()
+                x.get("current_win_streak", 0)
+                for x in latest_season_ladder_info.values()
                 if x.get("last_played_time_stamp", 0) > time.time() - _SECONDS_IN_5_DAYS
             )
 
             race_longest_win_streaks = (
-                x.get("longest_win_streak", 0) for x in latest_season_ladder_info.values()
+                x.get("longest_win_streak", 0)
+                for x in latest_season_ladder_info.values()
             )
 
-            return character_latest_season, max(race_win_streaks, default=0
-                                                ), max(race_longest_win_streaks, default=0)
+            return (
+                character_latest_season,
+                max(race_win_streaks, default=0),
+                max(race_longest_win_streaks, default=0),
+            )
         else:
             return 0, 0, 0
 
-    win_streaks_and_longest_win_streaks = list(map(map_characters_to_win_streaks, characters))
+    win_streaks_and_longest_win_streaks = list(
+        map(map_characters_to_win_streaks, characters)
+    )
 
     if win_streaks_and_longest_win_streaks:
         seasons, _, _ = zip(*win_streaks_and_longest_win_streaks)
@@ -49,16 +56,19 @@ def extract_win_streaks_for_characters(characters: dict):
 
         win_streaks_and_longest_win_streaks = [
             (season, character_win_streaks, character_longest_win_streaks)
-            for season, character_win_streaks, character_longest_win_streaks in
-            win_streaks_and_longest_win_streaks if season == latest_season
+            for season, character_win_streaks, character_longest_win_streaks in win_streaks_and_longest_win_streaks
+            if season == latest_season
         ]
         if win_streaks_and_longest_win_streaks:
             _, character_win_streaks, character_longest_win_streaks = zip(
                 *win_streaks_and_longest_win_streaks
             )
 
-            return latest_season, max(character_win_streaks,
-                                      default=0), max(character_longest_win_streaks, default=0)
+            return (
+                latest_season,
+                max(character_win_streaks, default=0),
+                max(character_longest_win_streaks, default=0),
+            )
 
     return 0, 0, 0
 
@@ -78,7 +88,9 @@ class WinStreakHandler(Handler):
     async def handle_message(self, client: discord.Client, message: discord.Message):
         self.rate_limited = True
 
-        members = await perform_database_task(client.loop, FetchAllinMembersDatabaseTask())
+        members = await perform_database_task(
+            client.loop, FetchAllinMembersDatabaseTask()
+        )
         member_characters = [
             (int(member_id), member_data.get("characters", {}))
             for member_id, member_data in members.items()
@@ -93,7 +105,8 @@ class WinStreakHandler(Handler):
         latest_season = max(seasons, default=0)
 
         win_streaks = [
-            (discord_id, win_streak) for discord_id, season, win_streak, _ in allin_win_streaks
+            (discord_id, win_streak)
+            for discord_id, season, win_streak, _ in allin_win_streaks
             if win_streak > 2 and season == latest_season
         ]
 
@@ -110,7 +123,9 @@ class WinStreakHandler(Handler):
         message_lines = []
         if win_streaks:
             message_lines += [
-                "{} is currently on a {} win streak!".format(get_name(discord_id), win_streak)
+                "{} is currently on a {} win streak!".format(
+                    get_name(discord_id), win_streak
+                )
                 for discord_id, win_streak in win_streaks
             ]
         else:
@@ -127,7 +142,9 @@ class WinStreakHandler(Handler):
 
         if longest_win_streaks:
             message_lines += ["", "**Longest Win Streaks This Season**"] + [
-                "{} went on a {} win streak!".format(get_name(discord_id), longest_win_streak)
+                "{} went on a {} win streak!".format(
+                    get_name(discord_id), longest_win_streak
+                )
                 for discord_id, longest_win_streak in longest_win_streaks
             ]
 

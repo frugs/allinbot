@@ -17,7 +17,11 @@ class FetchTwitchConnectionDatabaseTask(DatabaseTask[dict]):
 
     def execute_with_database(self, db: QueryBuilder) -> dict:
         twitch_connection = (
-            db.child("members").child(self.member).child("connections").child("twitch").get()
+            db.child("members")
+            .child(self.member)
+            .child("connections")
+            .child("twitch")
+            .get()
         )
         if not twitch_connection:
             twitch_connection = {}
@@ -41,7 +45,9 @@ class IsTwitchStreamLiveHandler(Handler):
         )
 
         if not twitch_connection.get("id", "") or not twitch_connection.get("name", ""):
-            await message.channel.send("<@{}> has no registered Twitch account.".format(discord_id))
+            await message.channel.send(
+                "<@{}> has no registered Twitch account.".format(discord_id)
+            )
             return
 
         url = "https://api.twitch.tv/helix/streams?first=1&user_id={}".format(
@@ -49,7 +55,9 @@ class IsTwitchStreamLiveHandler(Handler):
         )
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers={"Client-ID": self.twitch_client_id}) as resp:
+            async with session.get(
+                url, headers={"Client-ID": self.twitch_client_id}
+            ) as resp:
 
                 if resp.status != 200:
                     await message.channel.send("Unknown error occurred.")
@@ -63,9 +71,12 @@ class IsTwitchStreamLiveHandler(Handler):
             )
             await message.channel.send(is_live_message)
         else:
-            await message.channel.send("<@{}> is not currently live right now.".format(discord_id))
+            await message.channel.send(
+                "<@{}> is not currently live right now.".format(discord_id)
+            )
 
     async def description(self, client: discord.Client) -> str:
         return (
-            _TRIGGER + " {@mention} - checks if the mentioned member is currently live on Twitch."
+            _TRIGGER
+            + " {@mention} - checks if the mentioned member is currently live on Twitch."
         )

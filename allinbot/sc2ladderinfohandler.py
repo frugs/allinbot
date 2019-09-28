@@ -11,9 +11,13 @@ _TRIGGER = "!ladderinfo"
 _PATTERN = re.compile("^" + _TRIGGER + "\\s+<@[!]*(\\d*)>$")
 _RACES = ["Zerg", "Terran", "Protoss", "Random"]
 _LEAGUE_EMBLEMS = [
-    "<:bronze:230151914812211210>", "<:silver:230151947498291211>", "<:gold:230151929236291585>",
-    "<:platinum:230151940275830795>", "<:diamond:230151923276185611>",
-    "<:masters:230151935053922305>", "<:grandmaster:230152770521399296>"
+    "<:bronze:230151914812211210>",
+    "<:silver:230151947498291211>",
+    "<:gold:230151929236291585>",
+    "<:platinum:230151940275830795>",
+    "<:diamond:230151923276185611>",
+    "<:masters:230151935053922305>",
+    "<:grandmaster:230152770521399296>",
 ]
 
 
@@ -38,7 +42,9 @@ class Sc2LadderInfoHandler(Handler):
         if not ladder_info:
             message_to_send = "Could not find ladder info for <@{}>.".format(discord_id)
         else:
-            message_to_send = "**<@{}>'s StarCraft II ladder info**\n".format(discord_id)
+            message_to_send = "**<@{}>'s StarCraft II ladder info**\n".format(
+                discord_id
+            )
 
             battle_tag = ladder_info.get("battle_tag", None)
             if battle_tag:
@@ -55,27 +61,40 @@ class Sc2LadderInfoHandler(Handler):
 
             message_to_send += "\n"
 
-            races_played = [race for race in _RACES if ladder_info.get(race.lower() + "_player")]
+            races_played = [
+                race for race in _RACES if ladder_info.get(race.lower() + "_player")
+            ]
             if races_played:
-                message_to_send += "Highest ranked race(s): " + ", ".join(races_played) + "\n"
+                message_to_send += (
+                    "Highest ranked race(s): " + ", ".join(races_played) + "\n"
+                )
 
             current_league = ladder_info.get("current_league", None)
             if current_league:
-                message_to_send += "Current league: {}\n".format(_LEAGUE_EMBLEMS[current_league])
+                message_to_send += "Current league: {}\n".format(
+                    _LEAGUE_EMBLEMS[current_league]
+                )
 
-            current_season_games_played = ladder_info.get("current_season_games_played", None)
+            current_season_games_played = ladder_info.get(
+                "current_season_games_played", None
+            )
             if current_season_games_played is not None:
                 message_to_send += "Total games played this season: {}\n".format(
                     current_season_games_played
                 )
 
-            previous_season_games_played = ladder_info.get("previous_season_games_played", None)
+            previous_season_games_played = ladder_info.get(
+                "previous_season_games_played", None
+            )
             if previous_season_games_played is not None:
                 message_to_send += "Total games played last season: {}\n".format(
                     previous_season_games_played
                 )
 
-            message_to_send += "\nFurther information at: https://all-inspiration-apps.appspot.com/ladderinfo/" + discord_id
+            message_to_send += (
+                "\nFurther information at: https://all-inspiration-apps.appspot.com/ladderinfo/"
+                + discord_id
+            )
 
         await message.channel.send(message_to_send)
 

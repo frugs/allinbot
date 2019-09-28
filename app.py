@@ -33,7 +33,10 @@ def main():
 
     lobster_handler = allinbot.PingRandomPongHandler(
         "!bringoutthedancinglobsters",
-        [(0.1, "http://i.imgur.com/BMcur.gif"), (0.9, "Sorry, they are all asleep right now.")]
+        [
+            (0.1, "http://i.imgur.com/BMcur.gif"),
+            (0.9, "Sorry, they are all asleep right now."),
+        ],
     )
     bot.register_handler(lobster_handler)
 
@@ -62,5 +65,5 @@ def main():
     bot.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
