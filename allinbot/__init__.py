@@ -16,4 +16,5 @@ from allinbot.winstreakhandler import WinStreakHandler
 from allinbot.appendutcoffsethandler import AppendUtcOffsetHandler
 from .trialhandler import TrialHandler
 from .ladderherohandler import LadderHeroHandler
+from .temperaturehandler import FahrenheitToCelsiusHandler, CelsiusToFahrenheitHandler
 import allinbot.database

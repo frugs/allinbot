@@ -1,5 +1,4 @@
 import asyncio
-import json
 import os
 import sys
 import traceback
@@ -63,6 +62,9 @@ def main():
     bot.register_handler(allinbot.TrialHandler())
 
     bot.register_handler(allinbot.LadderHeroHandler())
+
+    bot.register_handler(allinbot.FahrenheitToCelsiusHandler())
+    bot.register_handler(allinbot.CelsiusToFahrenheitHandler())
 
     bot.run()
 
